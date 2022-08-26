@@ -19,6 +19,7 @@ import {
   VectorTriangle,
   Wand,
   World,
+  Map2,
 } from "tabler-icons-react";
 
 type SubmenuItem = {
@@ -77,6 +78,7 @@ export function getNavigationItems(
       ],
     },
     { label: t("sidemenu.facerecognition"), link: "/faces", icon: FaceId, color: "orange" },
+    { label: t("sidemenu.journeytracking"), link: "/journey", icon: Map2, color: "green" },
     {
       label: t("sidemenu.sharing"),
       link: "/users/",

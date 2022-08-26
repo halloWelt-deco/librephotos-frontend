@@ -172,7 +172,7 @@ export class AlbumPlace extends Component {
     if (albumPlaceIndex < place.length) {
       return (
         <div key={key} style={style}>
-          <div onClick={() => {}} style={{ padding: 5 }}>
+          <div onClick={() => { }} style={{ padding: 5 }}>
             {place[albumPlaceIndex].cover_photos.slice(0, 1).map((photo, index) => (
               <Anchor key={index} href={`/place/${place[albumPlaceIndex].id}/`}>
                 <Image

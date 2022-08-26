@@ -47,6 +47,7 @@ import { SharedFromMe } from "./layouts/sharing/SharedFromMe";
 import { SharedToMe } from "./layouts/sharing/SharedToMe";
 import { selectIsAuthenticated } from "./store/auth/authSelectors";
 import { useAppSelector } from "./store/store";
+import { JourneyMap } from "./layouts/JourneyMap";
 
 const noMenubarPaths = ["/signup", "/login"];
 
@@ -144,6 +145,7 @@ export function App() {
                   <Route path="socialgraph" element={<Graph />} />
                   <Route path="facescatter" element={<FaceScatter />} />
                   <Route path="countstats" element={<CountStats />} />
+                  <Route path="journey" element={<JourneyMap />} />
                 </Route>
               </Routes>
             </AppShell>
