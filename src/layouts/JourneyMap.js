@@ -3,8 +3,9 @@ import { Anchor, Image, Loader } from "@mantine/core";
 import _ from "lodash";
 import React, { Component } from "react";
 import { withTranslation } from "react-i18next";
-import { Map, Marker, TileLayer } from "react-leaflet";
+import { Map, Marker, TileLayer, Popup } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-markercluster";
+import { Icon } from "leaflet"
 import { connect } from "react-redux";
 import { AutoSizer, Grid } from "react-virtualized";
 import { compose } from "redux";
@@ -123,9 +124,37 @@ export class JourneyMap extends Component {
     }
 
     preprocess() {
+        // Define orginal marker source, and photos server address
+        const serverAddress = "https://hallowelt.r18i.me";
+        var source = "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png";
+        var id = -1;
+        var title = "";
+
+        const visiblePlaceNames = this.state.visiblePlaceAlbums.map(el => el.title);
         const markers = this.props.locationClusters.map((loc, index) => {
             if (loc[0] !== 0) {
-                return <Marker key={index} position={[loc[0], loc[1]]} title={loc[2]} />;
+                if (visiblePlaceNames.includes(loc[2])) {
+                    const album_index = visiblePlaceNames.indexOf(loc[2]);
+                    source = `${serverAddress}/media/thumbnails_big/${this.state.visiblePlaceAlbums[album_index].cover_photos[0].image_hash}`;
+                    id = this.state.visiblePlaceAlbums[album_index].id;
+                    title = this.state.visiblePlaceAlbums[album_index].title;
+                }
+                return <Marker key={index} position={[loc[0], loc[1]]} title={loc[2]} icon={new Icon({ iconUrl: source, iconSize: [40, 60], iconAnchor: [12, 41] })} >
+                    {/* Require Fix: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17.*/}
+                    <Popup>
+                        <div>
+                            <div>
+                                Id: {id}, title: {title}
+                            </div>
+                            <img
+                                src={source}
+                                width="150"
+                                height="150"
+                                alt="no img"
+                            />
+                        </div>
+                    </Popup>
+                </Marker>
             }
             return <div />;
         });
@@ -135,6 +164,31 @@ export class JourneyMap extends Component {
     render() {
         if (this.props.fetchedLocationClusters) {
             const markers = this.preprocess();
+            // var myIcon = L.divIcon({iconUrl: "myicon.png" });
+            // console.log(`${serverAddress}/media/thumbnails_big/${photo.image_hash}`);
+            // var myIcon = new L.DivIcon({
+            //     className: 'icon-div',
+            //     html: `<img src='http://leafletjs.com/examples/custom-icons/marker-icon.png'>`,
+            // });
+            // const serverAddress = "https://hallowelt.r18i.me"
+            // console.log(this.state.visiblePlaceAlbums.length);
+            // var source = "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png";
+            // if (this.state.visiblePlaceAlbums.length > 0) {
+            //     console.log(this.state.visiblePlaceAlbums[0]);
+            //     console.log(this.state.visiblePlaceAlbums[0].cover_photos[0].image_hash);
+
+            //     // myIcon = new L.DivIcon({
+            //     //     className: 'icon-div',
+            //     //     iconUrl: `${serverAddress}/media/thumbnails_big/${this.state.visiblePlaceAlbums[0].cover_photos[0].image_hash}`,
+            //     //     // iconSize: [10, 10],
+            //     //     // iconAnchor: [10, 10],
+            //     // });
+
+            //     source = `${serverAddress}/media/thumbnails_big/${this.state.visiblePlaceAlbums[0].cover_photos[0].image_hash}`;
+            //     console.log(`'${serverAddress}/media/thumbnails_big/${this.state.visiblePlaceAlbums[0].cover_photos[0].image_hash}'`);
+            // }
+            // console.log(source);
+            // console.log(myIcon);
 
             return (
                 <div>
@@ -150,6 +204,7 @@ export class JourneyMap extends Component {
                             style={{
                                 height: this.state.height,
                             }}
+                            onViewportChanged={this.onViewportChanged}
                             center={[40, 0]}
                             zoom={2}
                         >
@@ -159,11 +214,6 @@ export class JourneyMap extends Component {
                                 maxZoom="20"
                             />
                             <MarkerClusterGroup>{markers}</MarkerClusterGroup>
-                            {/* <Marker position={center} icon={new Icon({ iconUrl: markerIconPng, iconSize: [25, 41], iconAnchor: [12, 41] })}>
-                                <Popup>
-                                    A pretty CSS3 popup. <br /> Easily customizable.
-                                </Popup>
-                            </Marker> */}
                         </Map>
                     </div>
                 </div>
