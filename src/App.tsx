@@ -48,6 +48,8 @@ import { SharedToMe } from "./layouts/sharing/SharedToMe";
 import { selectIsAuthenticated } from "./store/auth/authSelectors";
 import { useAppSelector } from "./store/store";
 import { JourneyMap } from "./layouts/JourneyMap";
+import { UserTrip } from "./layouts/UserTrip";
+// import TestMap from "./layouts/TestMap";
 
 const noMenubarPaths = ["/signup", "/login"];
 
@@ -146,6 +148,8 @@ export function App() {
                   <Route path="facescatter" element={<FaceScatter />} />
                   <Route path="countstats" element={<CountStats />} />
                   <Route path="journey" element={<JourneyMap />} />
+                  {/* <Route path="testmap" element={<TestMap />} /> */}
+                  <Route path="usertrip" element={<UserTrip />} />
                 </Route>
               </Routes>
             </AppShell>

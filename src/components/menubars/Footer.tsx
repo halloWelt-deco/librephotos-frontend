@@ -26,7 +26,7 @@ export function FooterMenu(): JSX.Element {
 
   const navigationItems = getNavigationItems(t, isAuthenticated, canAccess);
 
-  navigationItems.push({ label: t("supportus"), link: SUPPORT_LINK, icon: Heart, color: "pink" });
+  //navigationItems.push({ label: t("supportus"), link: SUPPORT_LINK, icon: Heart, color: "pink" });
 
   const links = navigationItems.map(item => {
     if (item.display === false) {

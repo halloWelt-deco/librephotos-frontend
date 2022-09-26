@@ -20,6 +20,7 @@ import {
   Wand,
   World,
   Map2,
+  User,
 } from "tabler-icons-react";
 
 type SubmenuItem = {
@@ -47,7 +48,16 @@ export function getNavigationItems(
   canAccess: boolean
 ): Array<MenuItem> {
   return [
-    { label: t("sidemenu.photos"), link: "/", icon: Photo, color: "green" },
+    {
+      label: t("sidemenu.photos"),
+      link: "/",
+      icon: Photo,
+      color: "green",
+      submenu: [
+        { label: t("sidemenu.photos"), link: "/", icon: Trash, color: "black" },
+        { label: t("photos.deleted"), link: "/deleted", icon: Trash, color: "black" },
+      ]
+    },
     {
       label: t("sidemenu.albums"),
       link: "/people",
@@ -63,22 +73,24 @@ export function getNavigationItems(
         { label: t("sidemenu.autoalbums"), link: "/events", icon: Wand },
       ],
     },
+    { label: t("sidemenu.journeytracking"), link: "/journey", icon: Map2, color: "green" },
+    { label: t("sidemenu.usertrip"), link: "/usertrip", icon: User, color: "green" },
     {
       label: t("sidemenu.datavizsmall"),
-      link: "/placetree",
+      link: "/faces",
       icon: ChartLine,
       color: "yellow",
       submenu: [
         { header: t("sidemenu.dataviz") },
+        { label: t("sidemenu.facerecognition"), link: "/faces", icon: FaceId, color: "orange" },
         { label: t("sidemenu.placetree"), link: "/placetree", icon: VectorTriangle },
         { label: t("sidemenu.wordclouds"), link: "/wordclouds", icon: Cloud },
         { label: t("sidemenu.timeline"), link: "/timeline", icon: ChartBar },
-        { label: t("sidemenu.socialgraph"), link: "/socialgraph", icon: Share },
+        //{ label: t("sidemenu.socialgraph"), link: "/socialgraph", icon: Share },
         { label: t("sidemenu.facecluster"), link: "/facescatter", icon: MoodSmile },
       ],
     },
-    { label: t("sidemenu.facerecognition"), link: "/faces", icon: FaceId, color: "orange" },
-    { label: t("sidemenu.journeytracking"), link: "/journey", icon: Map2, color: "green" },
+    //{ label: t("sidemenu.facerecognition"), link: "/faces", icon: FaceId, color: "orange" },
     {
       label: t("sidemenu.sharing"),
       link: "/users/",
@@ -92,7 +104,7 @@ export function getNavigationItems(
         { label: t("sidemenu.sharedwithyou"), link: "/shared/tome/photos/", icon: Download, color: "green" },
       ],
     },
-    { label: t("photos.deleted"), link: "/deleted", icon: Trash, color: "black" },
+    //{ label: t("photos.deleted"), link: "/deleted", icon: Trash, color: "black" },
   ];
 }
 

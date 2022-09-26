@@ -182,6 +182,7 @@
     "mediafile": "Save to media file"
   },
   "sidemenu": {
+    "usertrip": "User Trips",
     "name": "LibrePhotos",
     "withtimestamp": "With Timestamp",
     "withouttimestamp": "Without Timestamp",
@@ -271,7 +272,7 @@
     "notimestamp": "Photos without Timestamps",
     "hidden": "Hidden Photos",
     "favorite": "Favorite Photos",
-    "deleted": "Trash"
+    "deleted": "Deleted Items"
   },
   "login": {
     "name": "LibrePhotos",
@@ -429,6 +430,7 @@
   "delete": "Delete",
   "numberofphotos": "{{number}} Photos",
   "myalbums": "My Albums",
+  "journeymap": "Journey Map",
   "things": "Things",
   "places": "Places",
   "loading": "Loading...",
