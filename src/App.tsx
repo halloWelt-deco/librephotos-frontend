@@ -113,7 +113,8 @@ export function App() {
                 <Route path="users" element={<PublicUserList />} />
                 <Route path="user/:username" element={<UserPublicPage />} />
                 <Route element={<ProtectedRoutes />}>
-                  <Route index element={<TimestampPhotos />} />
+                  <Route index element={<UserTrip />} />
+                  <Route path="photos" element={<TimestampPhotos />} />
                   <Route path="things" element={<AlbumThing />} />
                   <Route path="recent" element={<RecentlyAddedPhotos />} />
                   <Route path="favorites" element={<FavoritePhotos />} />
@@ -149,7 +150,7 @@ export function App() {
                   <Route path="countstats" element={<CountStats />} />
                   <Route path="journey" element={<JourneyMap />} />
                   {/* <Route path="testmap" element={<TestMap />} /> */}
-                  <Route path="usertrip" element={<UserTrip />} />
+                  {/* <Route path="usertrip" element={<UserTrip />} /> */}
                 </Route>
               </Routes>
             </AppShell>

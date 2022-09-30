@@ -50,11 +50,11 @@ export function getNavigationItems(
   return [
     {
       label: t("sidemenu.photos"),
-      link: "/",
+      link: "/photos",
       icon: Photo,
       color: "green",
       submenu: [
-        { label: t("sidemenu.photos"), link: "/", icon: Trash, color: "black" },
+        { label: t("sidemenu.photos"), link: "/photos", icon: Trash, color: "black" },
         { label: t("photos.deleted"), link: "/deleted", icon: Trash, color: "black" },
       ]
     },
@@ -74,7 +74,7 @@ export function getNavigationItems(
       ],
     },
     { label: t("sidemenu.journeytracking"), link: "/journey", icon: Map2, color: "green" },
-    { label: t("sidemenu.usertrip"), link: "/usertrip", icon: User, color: "green" },
+    { label: t("sidemenu.usertrip"), link: "/", icon: User, color: "green" },
     {
       label: t("sidemenu.datavizsmall"),
       link: "/faces",

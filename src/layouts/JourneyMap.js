@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { Anchor, Image, Loader } from "@mantine/core";
+import { Anchor, Button, Image, Loader } from "@mantine/core";
 import _ from "lodash";
 import React, { Component, useEffect } from "react";
 import { withTranslation } from "react-i18next";
@@ -13,7 +13,7 @@ import { Map2 } from "tabler-icons-react";
 import Lightbox from "react-image-lightbox";
 
 /* Mock up data */
-import data from "./test_data.json"
+import data from "./test_data.json";
 
 import { useAppDispatch, useAppSelector } from "../store/store";
 import { fetchPlaceAlbumsList } from "../actions/albumsActions";
@@ -34,10 +34,9 @@ export class JourneyMap extends Component {
         width: window.innerWidth,
         height: window.innerHeight - TOP_MENU_HEIGHT - 60,
         userList: [],
-        locationData: [],
         lightboxShow: false,
-        isOpen: false,
-        currentImgSrc: ""
+        currentImgSrc: "",
+        userData: null,
     };
 
     constructor(props) {
@@ -59,16 +58,19 @@ export class JourneyMap extends Component {
         // // const { pub, auth } = useAppSelector(store => store);
         // // const user = useAppSelector(selectUserSelfDetails);
         const userName = this.props.auth.access.name
-        const apiEndpoint = "http://152.67.97.63:8083/api/0/last?user=" + userName + "&device=phone"
-        fetch(apiEndpoint)
-            .then(response => response.text())
-            .then(result => console.log(result))
-            .catch(error => console.log('error', error));
+
+        const dataFile = "../../../owntracks/" + userName + "_data.json";
+        // const dummyFile = "../../../owntracks/user_data.json";
+        console.log(dataFile);
+        // console.log(dummyFile)
+        // fetch(dummyFile)
+        //     .then((response) => response.json())
+        //     .then((json) => console.log(json));
+        // const dummyData = require(dummyFile);
     }
 
     onViewportChanged = viewport => {
         this.setState({ viewport });
-
         const map = this.mapRef.current.leafletElement;
 
         // map.invalidateSize was undefined when this was called from Map div context
@@ -77,7 +79,6 @@ export class JourneyMap extends Component {
         }
 
         const bounds = map.getBounds();
-
         const visibleMarkers = this.props.locationClusters.filter(loc => {
             const markerLat = loc[0];
             const markerLng = loc[1];
@@ -93,7 +94,6 @@ export class JourneyMap extends Component {
         });
 
         const visiblePlaceNames = visibleMarkers.map(el => el[2]);
-
         const visiblePlaceAlbums = this.props.albumsPlaceList.filter(el => {
             if (visiblePlaceNames.includes(el.title)) {
                 return true;
@@ -128,12 +128,8 @@ export class JourneyMap extends Component {
     }
 
     handleClick = event => {
-        // this.setState({ isOpen: !this.state.isOpen });
         this.setState({ currentImgSrc: event.target.currentSrc })
         this.setState({ lightboxShow: !this.state.lightboxShow });
-        console.log("clicked");
-        console.log("event", event.target.currentSrc)
-        // console.log(event);
     }
 
     preprocess() {
@@ -143,7 +139,6 @@ export class JourneyMap extends Component {
         var id = -1;
         var title = "";
         const visiblePlaceNames = this.state.visiblePlaceAlbums.map(el => el.title);
-        // console.log(this.state.visiblePlaceAlbums)
         const markers = this.props.locationClusters.map((loc, index) => {
             if (loc[0] !== 0) {
                 if (visiblePlaceNames.includes(loc[2])) {
@@ -160,6 +155,7 @@ export class JourneyMap extends Component {
                             <div>
                                 Id: {id}, title: {title} <br />
                                 <span><b>Description</b></span><br /><input id="Description" type="text" placeholder={title} /><br />
+                                <input type="button" id="okBtn" value="Save" />
                             </div>
                             <img
                                 src={source}
@@ -180,41 +176,37 @@ export class JourneyMap extends Component {
 
     /* Get Mock up data*/
     getLocation() {
-        const userList = {};
-        // console.log("Inside:", data);
         const locations = [];
         Object.keys(data).forEach((user) => {
-            userList[user] = {};
             Object.keys(data[user]).forEach((device) => {
-                userList[user][device] = [];
-                // console.log("device", data[user][device]);
                 data[user][device].forEach((item) => {
-                    // console.log("item", item.lat)
                     locations.push([item.lat, item.lon]);
                 });
             });
         });
-
         return locations;
+    }
+
+    selectData(data) {
+        // Extract location from all of user's devices
+        const userList = {};
+        for (var key in data) {
+            userList[data[key].device] = [];
+            userList[data[key].device].push([data[key].lat, data[key].lon]);
+        }
+        console.log(userList);
+        return userList;
     }
 
     render() {
         if (this.props.fetchedLocationClusters) {
-            // console.log("auth", this.props.auth);
-            // console.log("photodetails", this.props.photoDetails);
             const locationData = this.getLocation();
             const limeOptions = { color: 'black' };
-            // const { data: userList } = useFetchUserListQuery();
-            // console.log(data);
-            // const fetchingUserList = useAppSelector(state => state.util.fetchingUserList);
-            // console.log(fetchingUserList);
-
+            console.log(this.state.userData);
+            const deviceData = this.selectData(this.state.userData);
             const markers = this.preprocess();
             function MultipleMarkers() {
-                // console.log(locationData);
                 return locationData.map((coordinate, index) => {
-                    // console.log([coordinate[0], coordinate[1]], index);
-                    // console.log(coordinate.length);
                     return <CircleMarker key={index} center={[coordinate[0], coordinate[1]]} opacity={1} fillOpacity={1} radius={4}>
                         <Popup>
                             <div>
@@ -225,7 +217,6 @@ export class JourneyMap extends Component {
                             </div>
                         </Popup>
                     </CircleMarker>;
-                    // }
                 });
             }
             return (
@@ -267,51 +258,13 @@ export class JourneyMap extends Component {
                             <MultipleMarkers />
                             <Polyline pathOptions={limeOptions} positions={locationData} />
                         </Map>
-                        {console.log("lightbox", this.state.lightboxShow)}
+
                         {this.state.lightboxShow && (
                             < Lightbox
                                 mainSrc={this.state.currentImgSrc}
-                                // mainCustomContent={getVideoComponent(lightboxImageId)}
                                 imageLoadErrorMessage=""
-                                // toolbarButtons={[
-                                //     <Toolbar
-                                //         // photosDetail={photoDetails[lightboxImageId]}
-                                //         // lightboxSidebarShow={lightboxSidebarShow}
-                                //         closeSidepanel={closeSidepanel}
-                                //     // isPublic={isPublic}
-                                //     />,
-                                // ]}
                                 onCloseRequest={() => this.setState({ lightboxShow: false })}
-                            // onAfterOpen={this.state.currentImgSrc}
-                            // reactModalStyle={{
-                            //     content: {},
-                            //     overlay: {
-                            //         right: lightboxSidebarShow ? LIGHTBOX_SIDEBAR_WIDTH : 0,
-                            //         width: lightboxSidebarShow ? width - SCROLLBAR_WIDTH - LIGHTBOX_SIDEBAR_WIDTH : width,
-                            //     },
-                            // }}
                             />
-                            // {lightboxSidebarShow ? (
-                            //     <Sidebar photoDetail={getCurrentPhotodetail()} closeSidepanel={closeSidepanel} isPublic={isPublic} />
-                            // ) : (
-                            //     <div></div>
-                            // )}
-                        )}
-                        {/* {console.log(this.state.isOpen)} */}
-                        {this.state.isOpen && (
-                            <dialog
-                                className="dialog"
-                                style={{ position: "absolute" }}
-                                open
-                                onClick={this.handleClick}
-                            >
-                                <img
-                                    className="image"
-                                    src={this.state.currentImgSrc}
-                                    onClick={this.handleClick}
-                                    alt="no image"
-                                />
-                            </dialog>
                         )}
                     </div>
                 </div>
