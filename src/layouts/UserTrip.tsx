@@ -123,6 +123,11 @@ export const UserTrip = () => {
     }
 
     const [date, setDate] = useState(new Date());
+    const [startTrip, setStartTrip] = useState(false);
+    function handleStartTrip() {
+        setStartTrip(startTrip => !startTrip);
+    }
+
 
     function SampleNextArrow(props) {
         const { className, style, onClick } = props;
@@ -188,9 +193,47 @@ export const UserTrip = () => {
                 }
             }
         ]
-
-
     };
+
+    // mock images
+    var imgUrl = [
+        "https://www.technipages.com/wp-content/uploads/2020/12/Measure-distance-in-Google-Maps.jpg",
+        "https://www.myrouteonline.com/wp-content/uploads/2018/05/Food-Delivery-e1527422030523.jpg",
+        "https://i.stack.imgur.com/RfbqG.png",
+        "https://developers.google.com/maps/images/landing/hero_directions_api.png",
+    ]
+
+    const [selectedImg, setSelectedImg] = useState<number>(-1)
+    const [selectedImgSrc, setSelectedImgSrc] = useState("")
+
+    function handleClickImage(e) {
+        console.log(e);
+        console.log(e.target.id);
+        setSelectedImg(e.target.id);
+        setSelectedImgSrc(e.target.src);
+    }
+
+    function travelCard() {
+        const cards: any[] = [];
+
+        imgUrl.forEach((url, index) => {
+            cards.push(
+                <div>
+                    <img
+                        style={{ height: "100%", width: "100%", objectFit: "contain" }}
+                        src={url}
+                        alt=""
+                        id={`${index}`}
+                        onClick={(event) => {
+                            handleClickImage(event);
+                            handleClickCard();
+                        }}
+                    />
+                </div>
+            );
+        });
+        return cards
+    }
 
     return (
         <div>
@@ -265,34 +308,55 @@ export const UserTrip = () => {
                     >
                         <Divider />
 
-                        <div
-                            style={{
-                                paddingTop: '20px',
-                                boxSizing: 'content-box',
-                            }}>
-                            <Group position="center">
-                                <Button color="Blue"
-                                    style={{
-                                        height: "120px",
-                                        width: "120px",
-                                        borderRadius: "50%",
-                                        wordWrap: "break-word",
-                                        // whitespace:"normal",
-                                    }}
-                                    onClick={handleTripButton}>
-                                    Create Trip
-                                </Button>
-                            </Group>
-                        </div>
+                        {!startTrip &&
+                            <div
+                                style={{
+                                    paddingTop: '20px',
+                                    boxSizing: 'content-box',
+                                }}>
+                                <Group position="center">
+                                    <Button color="Blue"
+                                        style={{
+                                            height: "120px",
+                                            width: "120px",
+                                            borderRadius: "50%",
+                                            wordWrap: "break-word",
+                                            // whitespace:"normal",
+                                        }}
+                                        onClick={handleTripButton}>
+                                        Start Trip
+                                    </Button>
+                                </Group>
+                            </div>
 
-                        {click &&
+                            || startTrip && !click &&
+                            <div
+                                style={{
+                                    paddingTop: '20px',
+                                    boxSizing: 'content-box',
+                                }}>
+                                <Group position="center">
+                                    <Button color="green"
+                                        style={{
+                                            height: "120px",
+                                            width: "120px",
+                                            borderRadius: "50%",
+                                            wordWrap: "break-word",
+                                            // whitespace:"normal",
+                                        }}
+                                        onClick={handleStartTrip}>
+                                        End Trip
+                                    </Button>
+                                </Group>
+                            </div>
+                        }
+
+                        {click && !startTrip &&
                             <Modal
                                 zIndex={1500}
                                 opened={click}
-                                title={<Title>Create New Trip</Title>}
-                                onClose={() => {
-                                    setClick(false);
-                                }}
+                                title={<Title>Start New Trip</Title>}
+                                onClose={handleTripButton}
                             >
                                 <Stack>
                                     <Group>
@@ -305,36 +369,19 @@ export const UserTrip = () => {
                                             selected={date}
                                             onChange={(date) => setDate(date)}
                                         />
-                                        {/* 
-                                        <>
-                                            <button onClick={handleClick} type='button' color="Blue">
-                                                {moment(date).format("MMM Do YYYY, dddd")}
-                                            </button>
-                                            {isOpen && (
-                                                <DatePicker selected={date} onChange={handleChange} inline />
-                                            )}
-                                        </> */}
                                     </Group>
                                     <Group>
 
                                     </Group>
                                     <Button
-                                        // onClick={() => {
-                                        //     dispatch(
-                                        //         createNewUserAlbum(
-                                        //             newAlbumTitle,
-                                        //             selectedImages.map(i => i.id)
-                                        //         )
-                                        //     );
-                                        //     onRequestClose();
-                                        //     setNewAlbumTitle("");
-                                        // }}
-                                        // disabled={albumsUserList
-                                        //     .map(el => el.title.toLowerCase().trim())
-                                        //     .includes(newAlbumTitle.toLowerCase().trim())}
+                                        onClick={() => {
+                                            // Start new trip, store details + datetime
+                                            handleStartTrip();
+                                            handleTripButton();
+                                        }}
                                         type="submit"
                                     >
-                                        {t("modalalbum.create")}
+                                        Start
                                     </Button>
                                 </Stack>
                             </Modal>
@@ -352,51 +399,37 @@ export const UserTrip = () => {
                 margin: "0 auto",
                 padding: "40px",
                 width: "100%",
-                // color: "#333",
-                // background: "#419be0",
-
             }}>
                 <Slider {...carouselSettings}>
-                    <div>
-                        <img
-                            style={{ height: "100%", width: "100%", objectFit: "contain" }}
-                            src='https://www.technipages.com/wp-content/uploads/2020/12/Measure-distance-in-Google-Maps.jpg'
-                            alt=""
-                            onClick={handleClickCard} />
-                    </div>
-                    <div>
-                        <img
-                            style={{ height: "100%", width: "100%", objectFit: "contain" }}
-                            src='https://www.myrouteonline.com/wp-content/uploads/2018/05/Food-Delivery-e1527422030523.jpg'
-                            alt=""
-                            onClick={handleClickCard} />
-                    </div>
-                    <div>
-                        <img
-                            style={{ height: "100%", width: "100%", objectFit: "contain" }}
-                            src='https://i.stack.imgur.com/RfbqG.png'
-                            alt=""
-                            onClick={handleClickCard} />
-                    </div>
-                    <div>
-                        <img
-                            style={{ height: "100%", width: "100%", objectFit: "contain" }}
-                            src='https://developers.google.com/maps/images/landing/hero_directions_api.png'
-                            alt=""
-                            onClick={handleClickCard} />
-                    </div>
+                    {travelCard()}
+
                 </Slider>
-                {clickCard &&
+                {
+                    clickCard &&
                     <Modal
                         zIndex={1500}
                         opened={clickCard}
-                        title={<Title>Clicked Card</Title>}
+                        title={<Title>Selected Card</Title>}
+                        style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            top: "20%",
+                        }}
                         onClose={() => {
                             setClickCard(false);
                         }}
                     >
-                    </Modal>}
-            </div>
+                        <div>
+                            <img
+                                style={{ height: "100%", width: "100%", objectFit: "contain" }}
+                                src={selectedImgSrc}
+                                alt=""
+                            />
+                        </div>
+                    </Modal>
+                }
+            </div >
             {/* <JourneyMap /> */}
         </div >
     );
