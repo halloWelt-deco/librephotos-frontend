@@ -312,13 +312,22 @@ export class JourneyMap extends Component {
                             <Polyline pathOptions={limeOptions} positions={userlocationsdata} />
 
 
-                            {this.state.addedMarkers.map((position, idx) =>
-                                <Marker key={`marker-${idx}`} marker_index={idx} position={position} draggable={true} onDragend={this.draggedMarker}>
-                                    <Popup>
-                                        <button onClick={() => this.removeMarker(position)}>Remove marker</button>
+                            {this.state.addedMarkers.map((pos, idx) =>
+                                <Marker key={`marker-${idx}`} marker_index={idx} position={pos} draggable={true} onDragend={this.draggedMarker}>
+                                    <Popup >
+                                        <div style={{ width: "max-content" }}>
+                                            Marker index:{idx}
+                                            <br />
+                                            coordinate_lat: {pos.lat},
+                                            <br />
+                                            {pos.lng}
+                                            <br />
+                                            <span><b>Description</b></span><br /><textarea id="Description" cols="25" rows="5"></textarea><br />
+                                            <br /><input type="button" id="okBtn" value="Save" />
+                                            <button onClick={() => this.removeMarker(pos)}>Remove marker</button>
+                                        </div>
                                     </Popup>
                                 </Marker>
-                                // console.log(position, idx)
                             )}
 
                         </Map>
