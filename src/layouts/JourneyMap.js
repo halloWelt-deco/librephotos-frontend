@@ -36,7 +36,8 @@ export class JourneyMap extends Component {
         userList: [],
         lightboxShow: false,
         currentImgSrc: "",
-        userData: null,
+        userData: [],
+        addedMarkers: []
     };
 
     constructor(props) {
@@ -54,19 +55,11 @@ export class JourneyMap extends Component {
             this.props.dispatch(fetchLocationClusters());
         }
 
-        console.log("in mount");
-        // // const { pub, auth } = useAppSelector(store => store);
-        // // const user = useAppSelector(selectUserSelfDetails);
-        const userName = this.props.auth.access.name
+        // const userName = this.props.auth.access.name
+        const userName = "user";
 
-        const dataFile = "../../../owntracks/" + userName + "_data.json";
-        // const dummyFile = "../../../owntracks/user_data.json";
-        console.log(dataFile);
-        // console.log(dummyFile)
-        // fetch(dummyFile)
-        //     .then((response) => response.json())
-        //     .then((json) => console.log(json));
-        // const dummyData = require(dummyFile);
+        const data = require("../owntracks-data/" + userName + "_data.json");
+        this.setState({ userData: data });
     }
 
     onViewportChanged = viewport => {
@@ -128,7 +121,7 @@ export class JourneyMap extends Component {
     }
 
     handleClick = event => {
-        this.setState({ currentImgSrc: event.target.currentSrc })
+        this.setState({ currentImgSrc: event.target.currentSrc });
         this.setState({ lightboxShow: !this.state.lightboxShow });
     }
 
@@ -187,38 +180,85 @@ export class JourneyMap extends Component {
         return locations;
     }
 
-    selectData(data) {
+    selectData(userD) {
         // Extract location from all of user's devices
-        const userList = {};
-        for (var key in data) {
-            userList[data[key].device] = [];
-            userList[data[key].device].push([data[key].lat, data[key].lon]);
+        // const userList = {};
+        const locations = [];
+        for (var points in userD["data"]) {
+            // userList[data[key].device] = [];
+            locations.push([userD["data"][points].lat, userD["data"][points].lon]);
         }
-        console.log(userList);
-        return userList;
+        return locations;
+    }
+
+    MultipleMarkers(userlocationsdata) {
+        return userlocationsdata.map((coordinate, index) => {
+            return <CircleMarker key={index} center={[coordinate[0], coordinate[1]]} opacity={1} fillOpacity={1} radius={4}>
+                <Popup>
+                    <div>
+                        Trip index:{index} coordinate: {coordinate[0]}, {coordinate[1]}
+                        <br />
+                        <span><b>Description</b></span><br /><textarea id="Description" cols="25" rows="5"></textarea><br />
+                        <br /><input type="button" id="okBtn" value="Save" />
+                    </div>
+                </Popup>
+            </CircleMarker>;
+        });
+    }
+
+    addMarker = event => {
+        //console.log(event.latlng.lat, event.latlng.lng);
+        const newmarker = this.state.addedMarkers
+        //console.log(newmarker)
+        newmarker.push(event.latlng)
+        this.setState({ addedMarkers: newmarker })
+    }
+
+    removeMarker = (pos) => {
+        this.setState({
+            addedMarkers:
+                this.state.addedMarkers.filter(coord => JSON.stringify(coord) !== JSON.stringify(pos))
+        });
+    };
+
+    draggedMarker = event => {
+        const latLng = event.target.getLatLng(); //get updated marker LatLng
+        const markerIndex = event.target.options.marker_index; //get marker index
+        //update 
+        this.setState(prevState => {
+            const addedMarkers = [...prevState.addedMarkers];
+            addedMarkers[markerIndex] = latLng;
+            return { addedMarkers: addedMarkers };
+        });
     }
 
     render() {
         if (this.props.fetchedLocationClusters) {
             const locationData = this.getLocation();
             const limeOptions = { color: 'black' };
-            console.log(this.state.userData);
-            const deviceData = this.selectData(this.state.userData);
+            const userlocationsdata = this.selectData(this.state.userData);
+            //console.log(userlocationsdata.slice(0, 10))
+
+            // Get album markers
             const markers = this.preprocess();
-            function MultipleMarkers() {
-                return locationData.map((coordinate, index) => {
-                    return <CircleMarker key={index} center={[coordinate[0], coordinate[1]]} opacity={1} fillOpacity={1} radius={4}>
-                        <Popup>
-                            <div>
-                                Trip index:{index} coordinate: {coordinate[0]}, {coordinate[1]}
-                                <br />
-                                <span><b>Description</b></span><br /><textarea id="Description" cols="25" rows="5"></textarea><br />
-                                <br /><input type="button" id="okBtn" value="Save" />
-                            </div>
-                        </Popup>
-                    </CircleMarker>;
-                });
-            }
+            // const MultipleMarkers = this.MultipleMarkers(userlocationsdata);
+            // Display location data
+            // function MultipleMarkers(locationData) {
+            //     return locationData.slice(0, 10).map((coordinate, index) => {
+            //         return <CircleMarker key={index} center={[coordinate[0], coordinate[1]]} opacity={1} fillOpacity={1} radius={4}>
+            //             <Popup>
+            //                 <div>
+            //                     Trip index:{index} coordinate: {coordinate[0]}, {coordinate[1]}
+            //                     <br />
+            //                     <span><b>Description</b></span><br /><textarea id="Description" cols="25" rows="5"></textarea><br />
+            //                     <br /><input type="button" id="okBtn" value="Save" />
+            //                 </div>
+            //             </Popup>
+            //         </CircleMarker>;
+            //     });
+            // }
+            console.log(this.state.addedMarkers)
+
             return (
                 <div>
                     <HeaderComponent
@@ -236,6 +276,7 @@ export class JourneyMap extends Component {
                             onViewportChanged={this.onViewportChanged}
                             center={[40, 0]}
                             zoom={2}
+                            onClick={this.addMarker}
                         >
                             <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
@@ -244,7 +285,7 @@ export class JourneyMap extends Component {
                             />
                             <MarkerClusterGroup>{markers}</MarkerClusterGroup>
 
-                            <Marker position={locationData[0]} icon={new Icon({ iconUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png", iconSize: [25, 41], iconAnchor: [12, 41] })}>
+                            <Marker position={userlocationsdata[0]} icon={new Icon({ iconUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png", iconSize: [25, 41], iconAnchor: [12, 41] })}>
                                 <Popup>
                                     <div>
                                         Start of the trip!
@@ -255,8 +296,31 @@ export class JourneyMap extends Component {
                                     </div>
                                 </Popup>
                             </Marker>
-                            <MultipleMarkers />
-                            <Polyline pathOptions={limeOptions} positions={locationData} />
+
+                            <Marker position={userlocationsdata.at(-1)} icon={new Icon({ iconUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png", iconSize: [25, 41], iconAnchor: [12, 41] })}>
+                                <Popup>
+                                    <div>
+                                        End of the trip!
+                                        <br />
+                                        <span><b>Trip Name</b></span><br /><input id="Trip Name" type="text" /><br /><br />
+                                        <span><b>Description</b></span><br /><textarea id="Description" cols="25" rows="5"></textarea><br />
+                                        <br /><input type="button" id="okBtn" value="Save" />
+                                    </div>
+                                </Popup>
+                            </Marker>
+                            {/* {MultipleMarkers} */}
+                            <Polyline pathOptions={limeOptions} positions={userlocationsdata} />
+
+
+                            {this.state.addedMarkers.map((position, idx) =>
+                                <Marker key={`marker-${idx}`} marker_index={idx} position={position} draggable={true} onDragend={this.draggedMarker}>
+                                    <Popup>
+                                        <button onClick={() => this.removeMarker(position)}>Remove marker</button>
+                                    </Popup>
+                                </Marker>
+                                // console.log(position, idx)
+                            )}
+
                         </Map>
 
                         {this.state.lightboxShow && (
@@ -266,6 +330,14 @@ export class JourneyMap extends Component {
                                 onCloseRequest={() => this.setState({ lightboxShow: false })}
                             />
                         )}
+
+                        {/* {this.state.addMarker &&
+                            <Marker position={event.latlng} draggable={true}>
+
+                            </Marker>
+                            //this.setState({addMarker:false})
+                        } */}
+
                     </div>
                 </div>
             );
