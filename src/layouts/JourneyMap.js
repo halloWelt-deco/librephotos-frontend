@@ -207,9 +207,7 @@ export class JourneyMap extends Component {
     }
 
     addMarker = event => {
-        //console.log(event.latlng.lat, event.latlng.lng);
         const newmarker = this.state.addedMarkers
-        //console.log(newmarker)
         newmarker.push(event.latlng)
         this.setState({ addedMarkers: newmarker })
     }
@@ -241,23 +239,7 @@ export class JourneyMap extends Component {
 
             // Get album markers
             const markers = this.preprocess();
-            // const MultipleMarkers = this.MultipleMarkers(userlocationsdata);
-            // Display location data
-            // function MultipleMarkers(locationData) {
-            //     return locationData.slice(0, 10).map((coordinate, index) => {
-            //         return <CircleMarker key={index} center={[coordinate[0], coordinate[1]]} opacity={1} fillOpacity={1} radius={4}>
-            //             <Popup>
-            //                 <div>
-            //                     Trip index:{index} coordinate: {coordinate[0]}, {coordinate[1]}
-            //                     <br />
-            //                     <span><b>Description</b></span><br /><textarea id="Description" cols="25" rows="5"></textarea><br />
-            //                     <br /><input type="button" id="okBtn" value="Save" />
-            //                 </div>
-            //             </Popup>
-            //         </CircleMarker>;
-            //     });
-            // }
-            console.log(this.state.addedMarkers)
+            //console.log(this.state.addedMarkers)
 
             return (
                 <div>
@@ -271,12 +253,13 @@ export class JourneyMap extends Component {
                             ref={this.mapRef}
                             className="journey-tracking-map"
                             style={{
-                                height: this.state.height,
+                                height: this.state.height - 40,
                             }}
                             onViewportChanged={this.onViewportChanged}
                             center={[40, 0]}
                             zoom={2}
-                            onClick={this.addMarker}
+                            ondblclick={this.addMarker}
+                            doubleClickZoom={false}
                         >
                             <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
