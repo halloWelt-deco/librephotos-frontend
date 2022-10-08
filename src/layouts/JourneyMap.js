@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { Anchor, Button, Image, Loader } from "@mantine/core";
+import { Anchor, Button, Group, Image, Loader, Menu, ActionIcon, Divider, Modal, Title, THEME_ICON_SIZES } from "@mantine/core";
 import _ from "lodash";
 import React, { Component, useEffect } from "react";
 import { withTranslation } from "react-i18next";
@@ -9,14 +9,19 @@ import { Icon } from "leaflet"
 import { connect } from "react-redux";
 import { AutoSizer, Grid } from "react-virtualized";
 import { compose } from "redux";
-import { Map2 } from "tabler-icons-react";
+import { Map2, Calendar, DotsVertical, Album } from "tabler-icons-react";
 import Lightbox from "react-image-lightbox";
+
+// import Dropdown from 'react-bootstrap/Dropdown';
+// import DropdownButton from 'react-bootstrap/DropdownButton';
+import DatePicker from "react-datepicker/dist/react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 /* Mock up data */
 import data from "./test_data.json";
 
 import { useAppDispatch, useAppSelector } from "../store/store";
-import { fetchPlaceAlbumsList } from "../actions/albumsActions";
+import { fetchPlaceAlbumsList, fetchAutoAlbumsList, fetchAlbumsAutoGalleries } from "../actions/albumsActions";
 import { fetchLocationClusters } from "../actions/utilActions";
 import { serverAddress } from "../api_client/apiClient";
 import { selectUserSelfDetails } from "../store/user/userSelectors";
@@ -37,7 +42,11 @@ export class JourneyMap extends Component {
         lightboxShow: false,
         currentImgSrc: "",
         userData: [],
-        addedMarkers: []
+        addedMarkers: [],
+        date: new Date(),
+        selectingDate: false,
+        selectedAlbum: false,
+        selectedAlbumMarkers: [],
     };
 
     constructor(props) {
@@ -55,6 +64,18 @@ export class JourneyMap extends Component {
             this.props.dispatch(fetchLocationClusters());
         }
 
+        if (this.props.albumsAutoList.length === 0) {
+            this.props.dispatch(fetchAutoAlbumsList());
+        }
+
+        if (!(this.props.albumsAutoList.length === 0)) {
+            this.props.albumsAutoList.map((dict) => {
+                fetchAlbumsAutoGalleries(this.props.dispatch, dict["id"]);
+            })
+        }
+        // need to keep this to ensure that the fetch auto album runs correctly
+        console.log(this.props.albumsAutoList.length)
+        
         // const userName = this.props.auth.access.name
         const userName = "user";
 
@@ -230,7 +251,106 @@ export class JourneyMap extends Component {
         });
     }
 
+    handleSelectDate() {
+        this.setState({ selectingDate: !selectingDate });
+    }
+
+    selectDate() {
+        // console.log("value");
+        return (
+            <Modal
+                zIndex={1500}
+                opened={this.state.selectingDate}
+                title={<Title>Select Date</Title>}
+                onClose={this.handleSelectDate}
+            >
+                <DatePicker selected={this.state.date} onChange={(new_date) => this.setState({ date: new_date })} />
+            </Modal>
+        );
+
+    }
+
+    fetchingAutoAlbum(title, id) {
+        // fetchAlbumsAutoGalleries(this.props.dispatch, id);
+        this.setState({ selectedAlbum: !this.state.selectedAlbum });
+        const markers = this.displayAlbum(this.props.albumsAutoGalleries[id]);
+        this.setState({ selectedAlbumMarkers: markers })
+    }
+
+    displayAlbum(id) {
+        this.setState({ selectedAlbum: !this.state.selectedAlbum });
+        console.log(this.props.albumsAutoGalleries[id])
+        const markers = this.props.albumsAutoGalleries[id]["photos"].map((photos, index) => {
+            console.log(photos);
+            console.log(photos["geolocation_json"].length)
+            if (!(Object.keys(photos["geolocation_json"]).length === 0)) {
+                const loc = photos["geolocation_json"]["query"];
+                const source = `${serverAddress}/media/thumbnails_big/${photos["image_hash"]}`;
+                const title = photos["geolocation_json"]["search_text"];
+                if (loc[1]) {
+                    return <Marker key={index} position={[loc[1], loc[0]]} title={title}
+                        icon={new Icon({ iconUrl: source, iconSize: [40, 60], iconAnchor: [12, 41] })}>
+                        {/* Require Fix: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17.*/}
+                        <Popup>
+                            <div>
+                                <div>
+                                    Id: {index}, title: {title} <br />
+                                    <span><b>Description</b></span><br /><input id="Description" type="text" placeholder={title} /><br />
+                                    <input type="button" id="okBtn" value="Save" />
+                                </div>
+                                <img
+                                    src={source}
+                                    width="150"
+                                    height="150"
+                                    alt="no img"
+                                    onClick={this.handleClick}
+                                />
+                            </div>
+                        </Popup>
+                    </Marker>
+                }
+
+            }
+        }
+        );
+        this.setState({ selectedAlbumMarkers: markers })
+    }
+
+    listAlbums() {
+        return <Menu
+            control={
+                <ActionIcon>
+                    <Album></Album>
+                </ActionIcon>
+            }
+            title={"Select Album"}
+        >
+
+            <Menu.Label>
+                {"Select Album"}
+            </Menu.Label>
+            <Divider />
+
+            {this.props.albumsAutoList.map((dict) => {
+                // fetchAlbumsAutoGalleries(this.props.dispatch, dict["id"]);
+
+                // console.log(dict["id"])
+                return <Menu.Item
+                    icon={<Album></Album>}
+                    //disabled={selectedItems.length === 0}
+                    onClick={() => {
+                        this.displayAlbum(dict["id"])
+                    }}
+                >
+                    {dict["title"]}
+
+                </Menu.Item>
+            })}
+        </Menu>
+    }
+
     render() {
+
         if (this.props.fetchedLocationClusters) {
             const locationData = this.getLocation();
             const limeOptions = { color: 'black' };
@@ -240,7 +360,6 @@ export class JourneyMap extends Component {
             // Get album markers
             const markers = this.preprocess();
             //console.log(this.state.addedMarkers)
-
             return (
                 <div>
                     <HeaderComponent
@@ -248,6 +367,35 @@ export class JourneyMap extends Component {
                         title={this.props.t("journeymap")}
                     /*fetching={this.props.fetchingAlbumsPlaceList}*/
                     />
+                    <Group style={{ display: "flex", justifyContent: 'flex-end' }}>
+                        <Menu
+                            control={
+                                <ActionIcon>
+                                    <Calendar></Calendar>
+                                </ActionIcon>
+                            }
+                            title={"Select Time"}
+                        >
+
+                            <Menu.Label>
+                                {"Select Time"}
+                            </Menu.Label>
+                            <Divider />
+
+                            <Menu.Item
+                                icon={<Calendar></Calendar>}
+                                //disabled={selectedItems.length === 0}
+                                onClick={() => {
+                                    this.selectDate()
+                                }}
+                            >
+                                {`${"Start Date"}`}
+
+                            </Menu.Item>
+                        </Menu>
+
+                        {this.listAlbums()}
+                    </Group >
                     <div style={{ marginLeft: -5 }}>
                         <Map
                             ref={this.mapRef}
@@ -266,52 +414,69 @@ export class JourneyMap extends Component {
                                 url='https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
                                 maxZoom="20"
                             />
-                            <MarkerClusterGroup>{markers}</MarkerClusterGroup>
+                            {console.log(this.state.selectedAlbum)}
+                            {!this.state.selectedAlbum && (
+                                <MarkerClusterGroup>{markers}</MarkerClusterGroup>
+                            )}
 
-                            <Marker position={userlocationsdata[0]} icon={new Icon({ iconUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png", iconSize: [25, 41], iconAnchor: [12, 41] })}>
-                                <Popup>
-                                    <div>
-                                        Start of the trip!
-                                        <br />
-                                        <span><b>Trip Name</b></span><br /><input id="Trip Name" type="text" /><br /><br />
-                                        <span><b>Description</b></span><br /><textarea id="Description" cols="25" rows="5"></textarea><br />
-                                        <br /><input type="button" id="okBtn" value="Save" />
-                                    </div>
-                                </Popup>
-                            </Marker>
-
-                            <Marker position={userlocationsdata.at(-1)} icon={new Icon({ iconUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png", iconSize: [25, 41], iconAnchor: [12, 41] })}>
-                                <Popup>
-                                    <div>
-                                        End of the trip!
-                                        <br />
-                                        <span><b>Trip Name</b></span><br /><input id="Trip Name" type="text" /><br /><br />
-                                        <span><b>Description</b></span><br /><textarea id="Description" cols="25" rows="5"></textarea><br />
-                                        <br /><input type="button" id="okBtn" value="Save" />
-                                    </div>
-                                </Popup>
-                            </Marker>
-                            {/* {MultipleMarkers} */}
-                            <Polyline pathOptions={limeOptions} positions={userlocationsdata} />
-
-
-                            {this.state.addedMarkers.map((pos, idx) =>
-                                <Marker key={`marker-${idx}`} marker_index={idx} position={pos} draggable={true} onDragend={this.draggedMarker}>
-                                    <Popup >
-                                        <div style={{ width: "max-content" }}>
-                                            Marker index:{idx}
+                            {!this.state.selectedAlbum && (
+                                <Marker position={userlocationsdata[0]} icon={new Icon({ iconUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png", iconSize: [25, 41], iconAnchor: [12, 41] })}>
+                                    <Popup>
+                                        <div>
+                                            Start of the trip!
                                             <br />
-                                            coordinate_lat: {pos.lat},
-                                            <br />
-                                            {pos.lng}
-                                            <br />
+                                            <span><b>Trip Name</b></span><br /><input id="Trip Name" type="text" /><br /><br />
                                             <span><b>Description</b></span><br /><textarea id="Description" cols="25" rows="5"></textarea><br />
                                             <br /><input type="button" id="okBtn" value="Save" />
-                                            <button onClick={() => this.removeMarker(pos)}>Remove marker</button>
                                         </div>
                                     </Popup>
                                 </Marker>
                             )}
+
+                            {!this.state.selectedAlbum && (
+                                <Marker position={userlocationsdata.at(-1)} icon={new Icon({ iconUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png", iconSize: [25, 41], iconAnchor: [12, 41] })}>
+                                    <Popup>
+                                        <div>
+                                            End of the trip!
+                                            <br />
+                                            <span><b>Trip Name</b></span><br /><input id="Trip Name" type="text" /><br /><br />
+                                            <span><b>Description</b></span><br /><textarea id="Description" cols="25" rows="5"></textarea><br />
+                                            <br /><input type="button" id="okBtn" value="Save" />
+                                        </div>
+                                    </Popup>
+                                </Marker>,
+                                <Polyline pathOptions={limeOptions} positions={userlocationsdata} />
+                            )}
+
+
+                            {!this.state.selectedAlbum && (
+
+                                this.state.addedMarkers.map((pos, idx) =>
+                                    <Marker key={`marker-${idx}`} marker_index={idx} position={pos} draggable={true} onDragend={this.draggedMarker}>
+                                        <Popup >
+                                            <div style={{ width: "max-content" }}>
+                                                Marker index:{idx}
+                                                <br />
+                                                coordinate_lat: {pos.lat},
+                                                <br />
+                                                {pos.lng}
+                                                <br />
+                                                <span><b>Description</b></span><br /><textarea id="Description" cols="25" rows="5"></textarea><br />
+                                                <br /><input type="button" id="okBtn" value="Save" />
+                                                <button onClick={() => this.removeMarker(pos)}>Remove marker</button>
+                                            </div>
+                                        </Popup>
+                                    </Marker>
+                                )
+                            )}
+
+
+
+                            {this.state.selectedAlbum && (
+                                <MarkerClusterGroup>{this.state.selectedAlbumMarkers}</MarkerClusterGroup>
+                            )}
+
+
 
                         </Map>
 
@@ -323,15 +488,11 @@ export class JourneyMap extends Component {
                             />
                         )}
 
-                        {/* {this.state.addMarker &&
-                            <Marker position={event.latlng} draggable={true}>
+                        {this.state.selectingDate
 
-                            </Marker>
-                            //this.setState({addMarker:false})
-                        } */}
-
+                        }
                     </div>
-                </div>
+                </div >
             );
         }
         return (
@@ -346,6 +507,11 @@ export class JourneyMap extends Component {
 JourneyMap = compose(
     connect(store => ({
         albumsPlaceList: store.albums.albumsPlaceList,
+        albumsAutoList: store.albums.albumsAutoList,
+        albumsAutoGalleries: store.albums.albumsAutoGalleries,
+        // fetchedAlbumsAutoGalleries: store.albums.fetchedAlbumsAutoGalleries,
+        // fetchingAlbumsAutoGalleries: store.albums.fetchingAlbumsAutoGalleries,
+
         locationClusters: store.util.locationClusters,
         fetchingLocationClusters: store.util.fetchingLocationClusters,
         fetchedLocationClusters: store.util.fetchedLocationClusters,
