@@ -271,8 +271,10 @@ export class JourneyMap extends Component {
     }
 
     displayAlbum(id) {
-        const map = this.mapRef.current.leafletElement;
+        // Need to keep this to ensure it runs?
         // console.log(this.props.albumsAutoGalleries[id]);
+
+        const map = this.mapRef.current.leafletElement;
         map.flyTo([this.props.albumsAutoGalleries[id]["gps_lat"], this.props.albumsAutoGalleries[id]["gps_lon"]], 10);
 
         this.setState({ selectedAlbum: true });
@@ -344,7 +346,7 @@ export class JourneyMap extends Component {
 
     render() {
         // Get auto created albums
-        if ((Object.keys(this.props.albumsAutoList).length === 0)) {
+        if ((Object.keys(this.props.albumsAutoGalleries).length === 0)) {
             this.props.albumsAutoList.map((dict) => {
                 fetchAlbumsAutoGalleries(this.props.dispatch, dict["id"]);
             })
