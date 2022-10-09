@@ -9,7 +9,7 @@ import { Icon } from "leaflet"
 import { connect } from "react-redux";
 import { AutoSizer, Grid } from "react-virtualized";
 import { compose } from "redux";
-import { Map2, Calendar, DotsVertical, Album } from "tabler-icons-react";
+import { Map2, Calendar, DotsVertical, Album, Home } from "tabler-icons-react";
 import Lightbox from "react-image-lightbox";
 
 // import Dropdown from 'react-bootstrap/Dropdown';
@@ -74,8 +74,8 @@ export class JourneyMap extends Component {
             })
         }
         // need to keep this to ensure that the fetch auto album runs correctly
-        console.log(this.props.albumsAutoList.length)
-        
+        //console.log(this.props.albumsAutoList.length)
+
         // const userName = this.props.auth.access.name
         const userName = "user";
 
@@ -270,19 +270,16 @@ export class JourneyMap extends Component {
 
     }
 
-    fetchingAutoAlbum(title, id) {
-        // fetchAlbumsAutoGalleries(this.props.dispatch, id);
-        this.setState({ selectedAlbum: !this.state.selectedAlbum });
-        const markers = this.displayAlbum(this.props.albumsAutoGalleries[id]);
-        this.setState({ selectedAlbumMarkers: markers })
-    }
-
     displayAlbum(id) {
-        this.setState({ selectedAlbum: !this.state.selectedAlbum });
-        console.log(this.props.albumsAutoGalleries[id])
+        const map = this.mapRef.current.leafletElement;
+        // console.log(this.props.albumsAutoGalleries[id]);
+        map.flyTo([this.props.albumsAutoGalleries[id]["gps_lat"], this.props.albumsAutoGalleries[id]["gps_lon"]], 10);
+
+        this.setState({ selectedAlbum: true });
+        // console.log(this.props.albumsAutoGalleries[id])
         const markers = this.props.albumsAutoGalleries[id]["photos"].map((photos, index) => {
-            console.log(photos);
-            console.log(photos["geolocation_json"].length)
+            // console.log(photos);
+            // console.log(photos["geolocation_json"].length)
             if (!(Object.keys(photos["geolocation_json"]).length === 0)) {
                 const loc = photos["geolocation_json"]["query"];
                 const source = `${serverAddress}/media/thumbnails_big/${photos["image_hash"]}`;
@@ -332,12 +329,8 @@ export class JourneyMap extends Component {
             <Divider />
 
             {this.props.albumsAutoList.map((dict) => {
-                // fetchAlbumsAutoGalleries(this.props.dispatch, dict["id"]);
-
-                // console.log(dict["id"])
                 return <Menu.Item
                     icon={<Album></Album>}
-                    //disabled={selectedItems.length === 0}
                     onClick={() => {
                         this.displayAlbum(dict["id"])
                     }}
@@ -350,12 +343,17 @@ export class JourneyMap extends Component {
     }
 
     render() {
+        // Get auto created albums
+        if ((Object.keys(this.props.albumsAutoList).length === 0)) {
+            this.props.albumsAutoList.map((dict) => {
+                fetchAlbumsAutoGalleries(this.props.dispatch, dict["id"]);
+            })
+        }
 
         if (this.props.fetchedLocationClusters) {
             const locationData = this.getLocation();
             const limeOptions = { color: 'black' };
             const userlocationsdata = this.selectData(this.state.userData);
-            //console.log(userlocationsdata.slice(0, 10))
 
             // Get album markers
             const markers = this.preprocess();
@@ -365,9 +363,18 @@ export class JourneyMap extends Component {
                     <HeaderComponent
                         icon={<Map2 size={50} />}
                         title={this.props.t("journeymap")}
-                    /*fetching={this.props.fetchingAlbumsPlaceList}*/
                     />
+
                     <Group style={{ display: "flex", justifyContent: 'flex-end' }}>
+                        <Button
+                            variant="subtle"
+                            onClick={() => {
+                                this.setState({ selectedAlbum: false });
+                                // "Center" of map
+                                this.mapRef.current.leafletElement.flyTo([19.907267772280026, 77.76560783386232], 2);
+                            }}
+                            title={"Return to Default"}
+                        ><Home /></Button>
                         <Menu
                             control={
                                 <ActionIcon>
@@ -396,6 +403,7 @@ export class JourneyMap extends Component {
 
                         {this.listAlbums()}
                     </Group >
+
                     <div style={{ marginLeft: -5 }}>
                         <Map
                             ref={this.mapRef}
@@ -404,7 +412,7 @@ export class JourneyMap extends Component {
                                 height: this.state.height - 40,
                             }}
                             onViewportChanged={this.onViewportChanged}
-                            center={[40, 0]}
+                            center={[19.907267772280026, 77.76560783386232]}
                             zoom={2}
                             ondblclick={this.addMarker}
                             doubleClickZoom={false}
