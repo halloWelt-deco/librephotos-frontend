@@ -93,7 +93,7 @@ export function SideMenuNarrow(): JSX.Element {
           <ActionIcon className={classes.linkIcon} color="pink" variant="light">
             <Heart />
           </ActionIcon>
-          <span style={{ flexGrow: 2 }}>{t("supportus")}</span>
+          <span style={{ flexGrow: 2 }}>Powered By Librephotos</span>
         </a>
       </Navbar.Section>
     </Navbar>
