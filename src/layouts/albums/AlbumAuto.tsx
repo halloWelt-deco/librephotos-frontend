@@ -38,7 +38,7 @@ export const AlbumAuto = () => {
   }, []);
   useEffect(() => {
     let numEntrySquaresPerRow = 6;
-    if (window.innerWidth < 600) {
+    if (window.innerWidth < 500) {
       numEntrySquaresPerRow = 2;
     } else if (window.innerWidth < 800) {
       numEntrySquaresPerRow = 3;
@@ -48,7 +48,12 @@ export const AlbumAuto = () => {
       numEntrySquaresPerRow = 5;
     }
 
-    const columnWidth = window.innerWidth - SIDEBAR_WIDTH - 5 - 5 - 15;
+    var columnWidth = 0;
+    if (window.innerWidth < 789) {
+      columnWidth = window.innerWidth - 5 - 5 - 15;
+    } else {
+      columnWidth = window.innerWidth - SIDEBAR_WIDTH - 5 - 5 - 15;
+    }
 
     const entrySquareSize = columnWidth / numEntrySquaresPerRow;
     setEntrySquareSize(entrySquareSize);
@@ -66,7 +71,7 @@ export const AlbumAuto = () => {
     if (albumAutoIndex < albumsAutoList.length) {
       return (
         <div key={key} style={style}>
-          <div onClick={() => {}} style={{ padding: 5 }}>
+          <div onClick={() => { }} style={{ padding: 5 }}>
             <Link to={`/event/${albumsAutoList[albumAutoIndex].id}`}>
               <Tile
                 video={albumsAutoList[albumAutoIndex].photos.video === true}

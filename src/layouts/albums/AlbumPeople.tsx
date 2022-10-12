@@ -63,7 +63,12 @@ export const AlbumPeople = () => {
       numEntrySquaresPerRow = 5;
     }
 
-    const columnWidth = window.innerWidth - SIDEBAR_WIDTH - 5 - 5 - 15;
+    var columnWidth = 0;
+    if (window.innerWidth < 789) {
+      columnWidth = window.innerWidth - 5 - 5 - 15;
+    } else {
+      columnWidth = window.innerWidth - SIDEBAR_WIDTH - 5 - 5 - 15;
+    }
 
     const entrySquareSize = columnWidth / numEntrySquaresPerRow;
 
@@ -157,8 +162,8 @@ export const AlbumPeople = () => {
             error={
               people.map(el => el.text.toLowerCase().trim()).includes(newPersonName.toLowerCase().trim())
                 ? t("personalbum.personalreadyexists", {
-                    name: newPersonName.trim(),
-                  })
+                  name: newPersonName.trim(),
+                })
                 : false
             }
             onChange={e => {

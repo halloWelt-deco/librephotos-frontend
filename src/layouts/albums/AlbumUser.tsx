@@ -90,7 +90,12 @@ export function AlbumUser() {
       numEntrySquaresPerRow = 5;
     }
 
-    const columnWidth = window.innerWidth - SIDEBAR_WIDTH - 5 - 5 - 15;
+    var columnWidth = 0;
+    if (window.innerWidth < 789) {
+      columnWidth = window.innerWidth - 5 - 5 - 15;
+    } else {
+      columnWidth = window.innerWidth - SIDEBAR_WIDTH - 5 - 5 - 15;
+    }
 
     const entrySquareSize = columnWidth / numEntrySquaresPerRow;
     setEntrySquareSize(entrySquareSize);

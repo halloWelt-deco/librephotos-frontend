@@ -154,7 +154,12 @@ export class AlbumPlace extends Component {
       numEntrySquaresPerRow = 5;
     }
 
-    const columnWidth = window.innerWidth - SIDEBAR_WIDTH - 5 - 5 - 15;
+    var columnWidth = 0;
+    if (window.innerWidth < 789) {
+      columnWidth = window.innerWidth - 5 - 5 - 15;
+    } else {
+      columnWidth = window.innerWidth - SIDEBAR_WIDTH - 5 - 5 - 15;
+    }
 
     const entrySquareSize = columnWidth / numEntrySquaresPerRow;
     this.setState({
@@ -177,7 +182,7 @@ export class AlbumPlace extends Component {
               <Anchor key={index} href={`/place/${place[albumPlaceIndex].id}/`}>
                 <Image
                   width={this.state.entrySquareSize - 10}
-                  height={this.state.entrySquareSize - 10}
+                  height={this.state.entrySquareSize - 20}
                   src={`${serverAddress}/media/thumbnails_big/${photo.image_hash}`}
                 />
               </Anchor>
@@ -199,7 +204,6 @@ export class AlbumPlace extends Component {
   render() {
     if (this.props.fetchedLocationClusters) {
       const markers = this.preprocess();
-
       return (
         <div>
           <HeaderComponent
