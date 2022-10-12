@@ -9,7 +9,7 @@ import { Icon } from "leaflet"
 import { connect } from "react-redux";
 import { AutoSizer, Grid } from "react-virtualized";
 import { compose } from "redux";
-import { Map2, Calendar, DotsVertical, Album, Home } from "tabler-icons-react";
+import { Map2, Calendar, DotsVertical, Album, Home, MapSearch } from "tabler-icons-react";
 import Lightbox from "react-image-lightbox";
 
 // import Dropdown from 'react-bootstrap/Dropdown';
@@ -74,10 +74,10 @@ export class JourneyMap extends Component {
             })
         }
         // need to keep this to ensure that the fetch auto album runs correctly
-        //console.log(this.props.albumsAutoList.length)
+        console.log(this.props.albumsAutoList.length)
 
-        // const userName = this.props.auth.access.name
-        const userName = "user";
+        const userName = this.props.auth.access.name
+        // const userName = "user";
 
         const data = require("../owntracks-data/" + userName + "_data.json");
         this.setState({ userData: data });
@@ -367,43 +367,29 @@ export class JourneyMap extends Component {
                         title={this.props.t("journeymap")}
                     />
 
-                    <Group style={{ display: "flex", justifyContent: 'flex-end' }}>
-                        <Button
-                            variant="subtle"
-                            onClick={() => {
-                                this.setState({ selectedAlbum: false });
-                                // "Center" of map
-                                this.mapRef.current.leafletElement.flyTo([19.907267772280026, 77.76560783386232], 2);
-                            }}
-                            title={"Return to Default"}
-                        ><Home /></Button>
-                        <Menu
-                            control={
-                                <ActionIcon>
-                                    <Calendar></Calendar>
-                                </ActionIcon>
-                            }
-                            title={"Select Time"}
-                        >
-
-                            <Menu.Label>
-                                {"Select Time"}
-                            </Menu.Label>
-                            <Divider />
-
-                            <Menu.Item
-                                icon={<Calendar></Calendar>}
-                                //disabled={selectedItems.length === 0}
+                    <Group style={{ display: "flex", justifyContent: 'flex-start' }}>
+                        <Group style={{ display: "flex", justifyContent: 'flex-start' }}>
+                            <Button
+                                variant="subtle"
                                 onClick={() => {
-                                    this.selectDate()
+                                    window.location.href = "https://admin:halloweltadmin@track.rxh.codes/?lat=-27.495682376002687&lng=153.01361382007602&zoom=19&start=2022-09-11T14%3A00%3A00&end=2022-10-12T13%3A59%3A59&user=admin&layers=last,line";
                                 }}
-                            >
-                                {`${"Start Date"}`}
+                                title={"Export Map"}
+                            ><MapSearch /></Button>
+                        </Group>
+                        <Group style={{ display: "flex", "margin-left": "auto" }}>
+                            <Button
+                                variant="subtle"
+                                onClick={() => {
+                                    this.setState({ selectedAlbum: false });
+                                    // "Center" of map
+                                    this.mapRef.current.leafletElement.flyTo([19.907267772280026, 77.76560783386232], 2);
+                                }}
+                                title={"Return to Default"}
+                            ><Home /></Button>
 
-                            </Menu.Item>
-                        </Menu>
-
-                        {this.listAlbums()}
+                            {this.listAlbums()}
+                        </Group>
                     </Group >
 
                     <div style={{ marginLeft: -5 }}>
@@ -480,13 +466,9 @@ export class JourneyMap extends Component {
                                 )
                             )}
 
-
-
                             {this.state.selectedAlbum && (
                                 <MarkerClusterGroup>{this.state.selectedAlbumMarkers}</MarkerClusterGroup>
                             )}
-
-
 
                         </Map>
 
