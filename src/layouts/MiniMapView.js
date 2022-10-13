@@ -284,9 +284,9 @@ export class MiniMapView extends Component {
 
     displayAlbum(id) {
         // Need to keep this to ensure it runs?
-        console.log(id)
+        //console.log(id)
         // console.log("display album", this.props.album[id])
-        console.log("display", this.props.albumsAutoGalleries[id]);
+        //console.log("display", this.props.albumsAutoGalleries[id]);
 
         // const map = this.mapRef.current.leafletElement;
         // map.flyTo([this.props.albumsAutoGallery["gps_lat"], this.props.albumsAutoGallery["gps_lon"]], 10);
@@ -406,11 +406,11 @@ export class MiniMapView extends Component {
                 //     })
                 // }
 
-                console.log("gallary", this.props.albumsAutoGalleries)
+                //console.log("gallary", this.props.albumsAutoGalleries)
 
 
                 const id = this.props.id;
-                console.log(id)
+                //console.log(id)
                 markers = this.props.albumsAutoGalleries[id]["photos"].map((photos, index) => {
                     if (!(Object.keys(photos["geolocation_json"]).length === 0)) {
                         const loc = photos["geolocation_json"]["query"];
@@ -421,12 +421,10 @@ export class MiniMapView extends Component {
                                 icon={new Icon({ iconUrl: source, iconSize: [40, 60], iconAnchor: [12, 41] })}>
                             </Marker>
                         }
-                    } else {
-                        console.log(index)
                     }
                 });
-                console.log("get markers", this.state.getMakers);
-                console.log("markers", markers)
+                // console.log("get markers", this.state.getMakers);
+                // console.log("markers", markers)
                 this.setState({ getMakers: !this.state.getMakers }, () => {
                     console.log("get markers", this.state.getMakers, this.props.id);
                 });
@@ -468,9 +466,6 @@ export class MiniMapView extends Component {
                                 url='https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
                                 maxZoom="20"
                             />
-                            {this.state.getMakers &&
-                                console.log("in map", this.state.imgMarkers)
-                            }
                             {
                                 this.state.getMakers &&
                                 < MarkerClusterGroup zoomToBoundsOnClick={false} > {this.state.imgMarkers}</MarkerClusterGroup>

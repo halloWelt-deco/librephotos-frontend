@@ -294,7 +294,7 @@ export class JourneyMap extends Component {
                         <Popup>
                             <div>
                                 <div>
-                                    Id: {index}, title: {title} <br />
+                                    Title: {title} <br />
                                     <span><b>Description</b></span><br /><input id="Description" type="text" placeholder={title} /><br />
                                     <input type="button" id="okBtn" value="Save" />
                                 </div>
@@ -323,11 +323,11 @@ export class JourneyMap extends Component {
                     <Album></Album>
                 </ActionIcon>
             }
-            title={"Select Album"}
+            title={"View Album"}
         >
 
             <Menu.Label>
-                {"Select Album"}
+                {"View Album"}
             </Menu.Label>
             <Divider />
 
@@ -402,7 +402,7 @@ export class JourneyMap extends Component {
                                     // "Center" of map
                                     this.mapRef.current.leafletElement.flyTo([19.907267772280026, 77.76560783386232], 2);
                                 }}
-                                title={"Return to Default"}
+                                title={"Return Home View"}
                             ><Home /></Button>
 
                             {this.listAlbums()}
@@ -433,7 +433,7 @@ export class JourneyMap extends Component {
                                 url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
                                 maxZoom="20"
                             />
-                            {console.log(this.state.selectedAlbum)}
+                            {/* {console.log(this.state.selectedAlbum)} */}
                             {!this.state.selectedAlbum && (
                                 <MarkerClusterGroup>{markers}</MarkerClusterGroup>
                             )}
@@ -494,8 +494,12 @@ export class JourneyMap extends Component {
                             {this.state.selectedAlbum && (
                                 <MarkerClusterGroup>{this.state.selectedAlbumMarkers}</MarkerClusterGroup>
                             )}
-
                         </Map>
+                        <div
+                            style={{
+                                font: "italic small-caps bold 16px/2 cursive", "z-index": "999", padding: "10px", "font-weight": "700"
+                            }}
+                        > DoubleTap to Add and Drag Maker</div>
 
                         {this.state.lightboxShow && (
                             < Lightbox

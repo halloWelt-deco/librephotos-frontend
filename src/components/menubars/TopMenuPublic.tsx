@@ -18,7 +18,7 @@ export function TopMenuCommon({ onToggleSidebar }: Props) {
       <Group>
         <Menu2 onClick={onToggleSidebar} />
         <Button color="dark" style={{ padding: 2 }}>
-          <Image height={30} width={30} src="/logo-white.png" />
+          <Image height={50} width={110} src="/logo-white.png" />
         </Button>
       </Group>
     </Grid.Col>

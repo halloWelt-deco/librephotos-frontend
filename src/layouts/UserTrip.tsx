@@ -49,10 +49,7 @@ import { ModalNextcloudScanDirectoryEdit } from "../components/modals/ModalNextc
 import { CountStats } from "../components/statistics";
 import { useAppDispatch, useAppSelector } from "../store/store";
 import { ModalAlbumEdit } from "../components/album/ModalAlbumEdit";
-import { JourneyMap } from "./JourneyMap";
 import { MiniMapView } from "./MiniMapView";
-import { TestMap } from "./TestMap";
-
 
 // import { cornersOfRectangle } from "@dnd-kit/core/dist/utilities/algorithms/helpers";
 
@@ -287,7 +284,7 @@ export const UserTrip = () => {
         const cards: any[] = [];
         if (!isTravelCard) {
             var travel_cards_props = {}
-            console.log("albbums", albumsAutoList)
+            // console.log("albbums", albumsAutoList)
 
             // console.log(album);
             travel_cards_props = {
@@ -304,7 +301,7 @@ export const UserTrip = () => {
                     <MiniMapView {...travel_cards_props} />
                 </div >
             )
-            console.log("user", isTravelCard);
+            //console.log("user", isTravelCard);
 
             travel_cards_props = {
                 dataFromParent: true,
