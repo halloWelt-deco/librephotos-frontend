@@ -216,7 +216,7 @@ export const UserTrip = () => {
         centerPadding: "60px",
         speed: 500,
         dots: true,
-        slidesToShow: 2,
+        slidesToShow: 3,
         slidesToScroll: 1,
         nextArrow: <SampleNextArrow />,
         prevArrow: <SamplePrevArrow />,
@@ -272,7 +272,9 @@ export const UserTrip = () => {
 
     const modal_cards_props = {
         dataFromParent: false,
-        id: id,
+        id: "4",
+        showmap: true
+
     }
 
     const [cards, setCards] = useState<any>([])
@@ -281,36 +283,17 @@ export const UserTrip = () => {
     }, []);
 
     function travelCard() {
-        // console.log((Object.keys(albumsAutoGalleries).length))
-
+        // Mock up travel cards, connected with the auto generated albums
         const cards: any[] = [];
         if (!isTravelCard) {
-            // setId("7");
-            // console.log(modal_cards_props)
             var travel_cards_props = {}
             console.log("albbums", albumsAutoList)
-
-            // albumsAutoList.forEach((album) => {
-            //     console.log(album);
-            //     travel_cards_props = {
-            //         dataFromParent: false,
-            //         album: album,
-            //     }
-            //     cards.push(
-            //         <div style={{ border: "20px solid black" }} onDoubleClick={(event) => {
-            //             handleClickImage(event);
-            //             handleClickCard();
-            //         }}
-            //         >
-            //             <TestMap {...travel_cards_props} />
-            //         </div >
-            //     )
-            // })
 
             // console.log(album);
             travel_cards_props = {
                 dataFromParent: true,
-                album: albumsAutoList["4"],
+                id: "4",
+                showmap: true
             }
             cards.push(
                 <div style={{ border: "20px solid black" }} onDoubleClick={(event) => {
@@ -325,56 +308,38 @@ export const UserTrip = () => {
 
             travel_cards_props = {
                 dataFromParent: true,
-                album: albumsAutoList["2"],
+                id: "2",
+                showmap: false
             }
             cards.push(
-                <div style={{ border: "20px solid black" }} onDoubleClick={(event) => {
-                    handleClickImage(event);
-                    handleClickCard();
-                }}
-                >
+                <div style={{ border: "20px solid black" }}>
                     <MiniMapView {...travel_cards_props} />
                 </div >
             )
 
             travel_cards_props = {
                 dataFromParent: true,
-                album: albumsAutoList["3"],
+                id: "3",
+                showmap: false
             }
             cards.push(
-                <div style={{ border: "20px solid black" }} onDoubleClick={(event) => {
-                    handleClickImage(event);
-                    handleClickCard();
-                }}
-                >
+                <div style={{ border: "20px solid black" }}>
                     <MiniMapView {...travel_cards_props} />
                 </div >
             )
 
-            // imgUrl.forEach((url, index) => {
-            //     cards.push(
-            //         <div>
-            //             <img
-            //                 // style={{ height: "100%", width: "100%", objectFit: "contain" }}
-            //                 src={url}
-            //                 alt=""
-            //                 id={`${index}`}
-            //                 // onClick={(event) => {
-            //                 //     handleClickImage(event);
-            //                 //     handleClickCard();
-            //                 // }}
-            //                 onDoubleClick={(event) => {
-            //                     handleClickImage(event);
-            //                     handleClickCard();
-            //                 }}
-            //             />
-            //         </div>
-            //     );
-            // });
-
+            travel_cards_props = {
+                dataFromParent: true,
+                id: "7",
+                showmap: false
+            }
+            cards.push(
+                <div style={{ border: "20px solid black" }}>
+                    <MiniMapView {...travel_cards_props} />
+                </div >
+            )
 
             setTravelCard(true);
-            // return cards
             setCards(cards)
         }
         return cards
@@ -602,11 +567,6 @@ export const UserTrip = () => {
                             </Button></Link>
                         </div>
                         <div>
-                            {/* <img
-                                style={{ height: "100%", width: "100%", objectFit: "contain" }}
-                                src={selectedImgSrc}
-                                alt=""
-                            /> */}
                             <MiniMapView {...modal_cards_props} />
                         </div>
                     </Modal>}
