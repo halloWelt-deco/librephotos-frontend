@@ -1,9 +1,9 @@
 {
-  "short_name": "LibrePhotos",
-  "name": "LibrePhotos",
+  "short_name": "JourneyLink",
+  "name": "JourneyLink",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "logo.png",
       "sizes": "72x72",
       "type": "image/png"
     }
