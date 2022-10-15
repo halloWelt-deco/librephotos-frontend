@@ -60,17 +60,17 @@ export function getNavigationItems(
     },
     {
       label: t("sidemenu.albums"),
-      link: "/people",
+      link: "/autoalbums",
       icon: Album,
       color: "blue",
       submenu: [
         { header: t("sidemenu.albums") },
+        { label: t("sidemenu.autoalbums"), link: "/events", icon: Wand },
         { label: t("sidemenu.people"), link: "/people", icon: Users },
         { label: t("sidemenu.places"), link: "/places", icon: Map },
         { label: t("sidemenu.things"), link: "/things", icon: Tags },
         { separator: true },
         { label: t("sidemenu.myalbums"), link: "/useralbums", icon: Bookmark },
-        { label: t("sidemenu.autoalbums"), link: "/events", icon: Wand },
       ],
     },
     { label: t("sidemenu.journeytracking"), link: "/journey", icon: Map2, color: "green" },
@@ -84,13 +84,9 @@ export function getNavigationItems(
         { header: t("sidemenu.dataviz") },
         { label: t("sidemenu.facerecognition"), link: "/faces", icon: FaceId, color: "orange" },
         { label: t("sidemenu.placetree"), link: "/placetree", icon: VectorTriangle },
-        // { label: t("sidemenu.wordclouds"), link: "/wordclouds", icon: Cloud },
         { label: t("sidemenu.timeline"), link: "/timeline", icon: ChartBar },
-        //{ label: t("sidemenu.socialgraph"), link: "/socialgraph", icon: Share },
-        // { label: t("sidemenu.facecluster"), link: "/facescatter", icon: MoodSmile },
       ],
     },
-    //{ label: t("sidemenu.facerecognition"), link: "/faces", icon: FaceId, color: "orange" },
     {
       label: t("sidemenu.sharing"),
       link: "/users/",
@@ -104,7 +100,6 @@ export function getNavigationItems(
         { label: t("sidemenu.sharedwithyou"), link: "/shared/tome/photos/", icon: Download, color: "green" },
       ],
     },
-    //{ label: t("photos.deleted"), link: "/deleted", icon: Trash, color: "black" },
   ];
 }
 

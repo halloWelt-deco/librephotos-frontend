@@ -6,9 +6,7 @@ import { Book, FaceId, Calendar, Photo, SettingsAutomation, Users, MapSearch } f
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-
 import { Link, useParams } from "react-router-dom";
-
 import { fetchCountStats } from "../actions/utilActions";
 import { deleteAutoAlbum, fetchAutoAlbumsList, fetchAlbumsAutoGalleries } from "../actions/albumsActions";
 import { useAppDispatch, useAppSelector } from "../store/store";
@@ -50,37 +48,13 @@ export const UserTrip = () => {
         }
     }, []);
 
-    const [click, setClick] = useState(false)
-    const [clickCard, setClickCard] = useState(false)
-    const [clickQR, setClickQR] = useState(false)
+    const [click, setClick] = useState(false);
+    const [clickCard, setClickCard] = useState(false);
+    const [clickQR, setClickQR] = useState(false);
     const [startTrip, setStartTrip] = useState(false);
 
     function handleTripButton() {
         setClick(click => !click);
-    }
-
-    function handleStartTrip() {
-        setStartTrip(startTrip => !startTrip);
-        //  store the timestamp of every time the Start Trip and End Trip button is pressed to a JSON file
-        //  timestamp of start trip
-        var timestamp = new Date();
-        var timestamp_start = timestamp
-        //  timestamp of end trip
-        var timestamp_end = timestamp
-        //  data to be stored in JSON file
-        var data = {
-            "trip_name": "",
-            "start_trip": timestamp_start,
-            "end_trip": timestamp_end
-        }
-        //  store data in JSON file
-        var json = JSON.stringify(data);
-        console.log(json);
-        // var fs = require('fs');
-        // fs.writeFile('trip.json', json, 'utf8', function (err) {
-        //     if (err) throw err;
-        //     console.log('complete');
-        // });
     }
 
     function SampleNextArrow(props) {
@@ -130,49 +104,41 @@ export const UserTrip = () => {
         ]
     };
 
-    const [isTravelCard, setTravelCard] = useState(false)
-    const [cards, setCards] = useState<any>([])
-    const [modalID, setModalID] = useState("4")
+    const [isTravelCard, setTravelCard] = useState(false);
+    const [cards, setCards] = useState<any>([]);
+
+    // Modal for selected mockup travel card
+    const [modalID, setModalID] = useState("4");
     var modal_cards_props = {
         dataFromParent: false,
         id: "3",
         showmap: true,
         modal: true,
-    }
-
-    // useEffect(() => {
-    //     travelCard();
-    // }, []);
+    };
 
     function travelCard() {
-
         // Mock up travel cards, connected with the auto generated albums
-        console.log(albumsAutoList)
         const cards: any[] = [];
         if (!isTravelCard && albumsAutoList.length !== 0) {
-            var travel_cards_props = {}
+            var travel_cards_props = {};
             albumsAutoList.forEach(album => {
-                console.log(album);
-                // if (albumsAutoList.hasOwnProperty(album)) {
                 travel_cards_props = {
                     dataFromParent: true,
                     id: album.id,
                     showmap: false,
                     modal: false,
-                }
+                };
+                // select a mock up album to connect with modal 
                 if (album.title === "Wednesday Early Morning  in Brisbane") {
                     travel_cards_props = {
                         dataFromParent: true,
                         id: album.id,
                         showmap: true,
                         modal: false
-                    }
+                    };
 
-                    // console.log("inside album")
                     setModalID(album.id);
                     modal_cards_props.id = album.id;
-                    // console.log(modal_cards_props)
-                    // console.log("modalid", modalID);
                     cards.push(
                         <div
                             style={{ border: "20px solid black" }}
@@ -182,7 +148,7 @@ export const UserTrip = () => {
                         >
                             <MiniMapView {...travel_cards_props} />
                         </div >
-                    )
+                    );
                 } else {
 
                     cards.push(
@@ -190,53 +156,14 @@ export const UserTrip = () => {
 
                             <MiniMapView {...travel_cards_props} />
                         </div >
-                    )
+                    );
                 }
             });
 
-
-            // travel_cards_props = {
-            //     dataFromParent: true,
-            //     id: "5",
-            //     showmap: false
-            // }
-            // cards.push(
-            //     <div style={{ border: "20px solid black" }}>
-            //         <MiniMapView {...travel_cards_props} />
-            //     </div >
-            // )
-
-            // travel_cards_props = {
-            //     dataFromParent: true,
-            //     id: "4",
-            //     showmap: false
-            // }
-            // cards.push(
-            //     <div style={{ border: "20px solid black" }}>
-            //         <MiniMapView {...travel_cards_props} />
-            //     </div >
-            // )
-
-            // travel_cards_props = {
-            //     dataFromParent: true,
-            //     id: "3",
-            //     showmap: true
-            // }
-            // cards.push(
-            //     <div
-            //         style={{ border: "20px solid black" }}
-            //         onDoubleClick={() => {
-            //             setClickCard(clickCard => !clickCard);
-            //         }}
-            //     >
-            //         <MiniMapView {...travel_cards_props} />
-            //     </div >
-            // )
-
             setTravelCard(true);
-            setCards(cards)
+            setCards(cards);
         }
-        return cards
+        return cards;
     }
 
     const RedirectPage = () => {
@@ -245,6 +172,7 @@ export const UserTrip = () => {
 
     return (
         < div >
+            {/* Fetch for travel cards */}
             {!isTravelCard && travelCard()}
             <Stack align="center" justify="flex-start">
                 <Group spacing="xs">
@@ -302,6 +230,7 @@ export const UserTrip = () => {
                 {!isMobile && <Button onClick={() => { setClickQR(clickQR => !clickQR) }}> Config Location Tracking</Button >}
                 {isMobile && <Button onClick={() => { RedirectPage() }}>Config Location Tracking</Button>}
 
+                {/* If not mobile view, display QR code when clicked to config location tracking */}
                 {clickQR &&
                     < Modal
                         zIndex={1500}
@@ -332,7 +261,6 @@ export const UserTrip = () => {
                             padding: theme.spacing.xl,
                             borderRadius: theme.radius.md,
                             cursor: "pointer",
-
                             "&:hover": {
                                 backgroundColor: theme.colorScheme === "dark" ? theme.colors.dark[5] : theme.colors.gray[1],
                             },
@@ -373,8 +301,7 @@ export const UserTrip = () => {
                                             width: "120px",
                                             borderRadius: "50%",
                                             wordWrap: "break-word",
-                                        }}
-                                        onClick={handleStartTrip}>
+                                        }}>
                                         End Trip
                                     </Button>
                                 </Group>
@@ -395,11 +322,7 @@ export const UserTrip = () => {
                                     </Group>
 
                                     <Button
-                                        onClick={() => {
-                                            // Start new trip, store details + datetime
-                                            handleStartTrip();
-                                            handleTripButton();
-                                        }}
+                                        onClick={() => { handleTripButton() }}
                                         type="submit"
                                     >
                                         Start
@@ -413,8 +336,8 @@ export const UserTrip = () => {
                     <MapSearch size={35} />
                     <Title order={2}>Trip Cards</Title>
                 </Group>
-
             </Stack >
+
             <div style={{
                 margin: "0 auto",
                 padding: "40px",

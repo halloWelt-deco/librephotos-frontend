@@ -109,10 +109,10 @@ export const Library = () => {
   return (
     <Stack align="center" justify="flex-start">
       <Group spacing="xs">
-        <Book size={35} />
-        <Title order={2}>{t("settings.library")}</Title>
+        <Refresh size={35} />
+        <Title order={2}>{t("settings.management")}</Title>
       </Group>
-      <CountStats />
+      {/* <CountStats /> */}
       <Divider hidden />
       <SimpleGrid
         cols={4}

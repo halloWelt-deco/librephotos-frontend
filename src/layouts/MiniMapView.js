@@ -21,7 +21,6 @@ export class MiniMapView extends Component {
         width: window.innerWidth,
         height: window.innerHeight - TOP_MENU_HEIGHT - 60,
         userData: [],
-        //date: new Date(),
         getMakers: false,
         imgMarkers: [],
         pos: [1, 1]
@@ -146,7 +145,7 @@ export class MiniMapView extends Component {
                                 <TileLayer
                                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
                                     url='https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-                                    maxZoom="20"
+                                    maxZoom="19"
                                 />
                                 {this.state.getMakers &&
                                     < MarkerClusterGroup zoomToBoundsOnClick={false} > {this.state.imgMarkers}</MarkerClusterGroup>
