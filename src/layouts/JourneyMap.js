@@ -9,29 +9,18 @@ import { Icon } from "leaflet"
 import { connect } from "react-redux";
 import { AutoSizer, Grid } from "react-virtualized";
 import { compose } from "redux";
-import { Map2, Calendar, DotsVertical, Album, Home, MapSearch, Download, Browser } from "tabler-icons-react";
+import { Map2, Calendar, DotsVertical, Album, Home, MapSearch, Download, Browser, ExternalLink } from "tabler-icons-react";
 import Lightbox from "react-image-lightbox";
-import axios from 'axios';
 
-// import Dropdown from 'react-bootstrap/Dropdown';
-// import DropdownButton from 'react-bootstrap/DropdownButton';
-import DatePicker from "react-datepicker/dist/react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-
-/* Mock up data */
-import data from "./test_data.json";
-
-import { useAppDispatch, useAppSelector } from "../store/store";
 import { fetchPlaceAlbumsList, fetchAutoAlbumsList, fetchAlbumsAutoGalleries } from "../actions/albumsActions";
 import { fetchLocationClusters } from "../actions/utilActions";
 import { serverAddress } from "../api_client/apiClient";
-import { selectUserSelfDetails } from "../store/user/userSelectors";
 
 import { LEFT_MENU_WIDTH, TOP_MENU_HEIGHT } from "../ui-constants";
 import { HeaderComponent } from "./albums/HeaderComponent";
 
 const SIDEBAR_WIDTH = LEFT_MENU_WIDTH;
-
+const CENTER_OF_MAP = [19.907267772280026, 77.76560783386232];
 export class JourneyMap extends Component {
     state = {
         visibleMarkers: [],
@@ -75,10 +64,10 @@ export class JourneyMap extends Component {
             })
         }
         // need to keep this to ensure that the fetch auto album runs correctly
-        console.log(this.props.albumsAutoList.length)
+        // console.log(this.props.albumsAutoList.length)
 
-        const userName = this.props.auth.access.name
-        // const userName = "user";
+        // const userName = this.props.auth.access.name
+        const userName = "user";
 
         const data = require("../owntracks-data/" + userName + "_data.json");
         this.setState({ userData: data });
@@ -122,26 +111,6 @@ export class JourneyMap extends Component {
         });
     };
 
-    static getDerivedStateFromProps(nextProps, prevState) {
-        if (prevState.locationClusters.length === 0) {
-            const visibleMarkers = nextProps.locationClusters;
-            const visiblePlaceNames = visibleMarkers.map(el => el[2]);
-            const visiblePlaceAlbums = nextProps.albumsPlaceList.filter(el => {
-                if (visiblePlaceNames.includes(el.title)) {
-                    return true;
-                }
-                return false;
-            });
-
-            return {
-                visibleMarkers: nextProps.locationClusters,
-                locationClusters: nextProps.locationClusters,
-                visiblePlaceAlbums: _.sortBy(visiblePlaceAlbums, ["geolocation_level", "photo_count"]),
-            };
-        }
-        return { ...prevState };
-    }
-
     handleClick = event => {
         this.setState({ currentImgSrc: event.target.currentSrc });
         this.setState({ lightboxShow: !this.state.lightboxShow });
@@ -164,11 +133,10 @@ export class JourneyMap extends Component {
                 }
                 return <Marker key={index} position={[loc[0], loc[1]]} title={loc[2]}
                     icon={new Icon({ iconUrl: source, iconSize: [40, 60], iconAnchor: [12, 41] })}>
-                    {/* Require Fix: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17.*/}
                     <Popup>
                         <div>
                             <div>
-                                Id: {id}, title: {title} <br />
+                                Title: {title} <br />
                                 <span><b>Description</b></span><br /><input id="Description" type="text" placeholder={title} /><br />
                                 <input type="button" id="okBtn" value="Save" />
                             </div>
@@ -189,43 +157,13 @@ export class JourneyMap extends Component {
         return markers;
     }
 
-    /* Get Mock up data*/
-    getLocation() {
-        const locations = [];
-        Object.keys(data).forEach((user) => {
-            Object.keys(data[user]).forEach((device) => {
-                data[user][device].forEach((item) => {
-                    locations.push([item.lat, item.lon]);
-                });
-            });
-        });
-        return locations;
-    }
-
     selectData(userD) {
         // Extract location from all of user's devices
-        // const userList = {};
         const locations = [];
         for (var points in userD["data"]) {
-            // userList[data[key].device] = [];
             locations.push([userD["data"][points].lat, userD["data"][points].lon]);
         }
         return locations;
-    }
-
-    MultipleMarkers(userlocationsdata) {
-        return userlocationsdata.map((coordinate, index) => {
-            return <CircleMarker key={index} center={[coordinate[0], coordinate[1]]} opacity={1} fillOpacity={1} radius={4}>
-                <Popup>
-                    <div>
-                        Trip index:{index} coordinate: {coordinate[0]}, {coordinate[1]}
-                        <br />
-                        <span><b>Description</b></span><br /><textarea id="Description" cols="25" rows="5"></textarea><br />
-                        <br /><input type="button" id="okBtn" value="Save" />
-                    </div>
-                </Popup>
-            </CircleMarker>;
-        });
     }
 
     addMarker = event => {
@@ -236,15 +174,14 @@ export class JourneyMap extends Component {
 
     removeMarker = (pos) => {
         this.setState({
-            addedMarkers:
-                this.state.addedMarkers.filter(coord => JSON.stringify(coord) !== JSON.stringify(pos))
+            addedMarkers: this.state.addedMarkers.filter(coord => JSON.stringify(coord) !== JSON.stringify(pos))
         });
     };
 
     draggedMarker = event => {
         const latLng = event.target.getLatLng(); //get updated marker LatLng
         const markerIndex = event.target.options.marker_index; //get marker index
-        //update 
+
         this.setState(prevState => {
             const addedMarkers = [...prevState.addedMarkers];
             addedMarkers[markerIndex] = latLng;
@@ -252,37 +189,12 @@ export class JourneyMap extends Component {
         });
     }
 
-    handleSelectDate() {
-        this.setState({ selectingDate: !selectingDate });
-    }
-
-    selectDate() {
-        // console.log("value");
-        return (
-            <Modal
-                zIndex={1500}
-                opened={this.state.selectingDate}
-                title={<Title>Select Date</Title>}
-                onClose={this.handleSelectDate}
-            >
-                <DatePicker selected={this.state.date} onChange={(new_date) => this.setState({ date: new_date })} />
-            </Modal>
-        );
-
-    }
-
     displayAlbum(id) {
-        // Need to keep this to ensure it runs?
-        // console.log(this.props.albumsAutoGalleries[id]);
-
         const map = this.mapRef.current.leafletElement;
         map.flyTo([this.props.albumsAutoGalleries[id]["gps_lat"], this.props.albumsAutoGalleries[id]["gps_lon"]], 10);
 
         this.setState({ selectedAlbum: true });
-        // console.log(this.props.albumsAutoGalleries[id])
         const markers = this.props.albumsAutoGalleries[id]["photos"].map((photos, index) => {
-            // console.log(photos);
-            // console.log(photos["geolocation_json"].length)
             if (!(Object.keys(photos["geolocation_json"]).length === 0)) {
                 const loc = photos["geolocation_json"]["query"];
                 const source = `${serverAddress}/media/thumbnails_big/${photos["image_hash"]}`;
@@ -290,7 +202,6 @@ export class JourneyMap extends Component {
                 if (loc[1]) {
                     return <Marker key={index} position={[loc[1], loc[0]]} title={title}
                         icon={new Icon({ iconUrl: source, iconSize: [40, 60], iconAnchor: [12, 41] })}>
-                        {/* Require Fix: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17.*/}
                         <Popup>
                             <div>
                                 <div>
@@ -351,19 +262,19 @@ export class JourneyMap extends Component {
             this.props.albumsAutoList.map((dict) => {
                 fetchAlbumsAutoGalleries(this.props.dispatch, dict["id"]);
             })
+            console.log(this.props.albumsAutoList);
         }
 
         if (this.props.fetchedLocationClusters) {
-            const locationData = this.getLocation();
             const limeOptions = { color: 'black' };
             const userlocationsdata = this.selectData(this.state.userData);
             const user_name = this.props.auth.access.name
             const pass = "hallowelt";
-            // const url = "https://admin:halloweltadmin@track.rxh.codes/?lat=-27.495682376002687&lng=153.01361382007602&zoom=19&start=2022-09-11T14%3A00%3A00&end=2022-10-12T13%3A59%3A59&user=admin&layers=last,line";
             const url = "https://" + user_name + ":" + pass + "@track.rxh.codes/?lat=-27.482165484132235&lng=153.01487394999995&zoom=15&start=2022-09-12T14%3A00%3A00&end=2022-10-13T13%3A59%3A59&user=" + user_name + "&layers=last,line";
+
             // Get album markers
             const markers = this.preprocess();
-            //console.log(this.state.addedMarkers)
+
             return (
                 <div>
                     <HeaderComponent
@@ -377,30 +288,30 @@ export class JourneyMap extends Component {
                                 variant="subtle"
                                 onClick={() => {
                                     window.open(url, '_blank');
-                                    axios.get(url, {
-                                        headers: {
-                                            "Access-Control-Allow-Origin": "*",
-                                            Authorization: `Bearer ${sessionStorage.getItem("auth-token")}`,
-                                        }
-                                    }).then((response) => {
-                                        const temp = window.URL.createObjectURL(new Blob([response.data]));
-                                        const link = document.createElement('a');
-                                        link.href = temp;
-                                        link.setAttribute('download', 'location_data.html');
-                                        document.body.appendChild(link);
-                                        link.click();
-                                    });
+                                    // axios.get(url, {
+                                    //     headers: {
+                                    //         "Access-Control-Allow-Origin": "*",
+                                    //         Authorization: `Bearer ${sessionStorage.getItem("auth-token")}`,
+                                    //     }
+                                    // }).then((response) => {
+                                    //     const temp = window.URL.createObjectURL(new Blob([response.data]));
+                                    //     const link = document.createElement('a');
+                                    //     link.href = temp;
+                                    //     link.setAttribute('download', 'location_data.html');
+                                    //     document.body.appendChild(link);
+                                    //     link.click();
+                                    // });
                                 }}
                                 title={"Export Map"}
-                            ><MapSearch /></Button>
+                            ><ExternalLink /></Button>
                         </Group>
-                        <Group style={{ display: "flex", "margin-left": "auto" }}>
+                        <Group style={{ display: "flex", "marginLeft": "auto" }}>
                             <Button
                                 variant="subtle"
                                 onClick={() => {
                                     this.setState({ selectedAlbum: false });
                                     // "Center" of map
-                                    this.mapRef.current.leafletElement.flyTo([19.907267772280026, 77.76560783386232], 2);
+                                    this.mapRef.current.leafletElement.flyTo(CENTER_OF_MAP, 2);
                                 }}
                                 title={"Return Home View"}
                             ><Home /></Button>
@@ -417,29 +328,22 @@ export class JourneyMap extends Component {
                                 height: this.state.height - 90,
                             }}
                             onViewportChanged={this.onViewportChanged}
-                            center={[19.907267772280026, 77.76560783386232]}
+                            center={CENTER_OF_MAP}
                             zoom={2}
                             ondblclick={this.addMarker}
                             doubleClickZoom={false}
                         >
-                            {/* <TileLayer
-                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                                url='https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-                                maxZoom="20"
-                            /> */}
-
                             <TileLayer
                                 attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
                                 url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
                                 maxZoom="20"
                             />
-                            {/* {console.log(this.state.selectedAlbum)} */}
                             {!this.state.selectedAlbum && (
                                 <MarkerClusterGroup>{markers}</MarkerClusterGroup>
                             )}
 
                             {!this.state.selectedAlbum && (
-                                <Marker position={userlocationsdata[0]} icon={new Icon({ iconUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png", iconSize: [25, 41], iconAnchor: [12, 41] })}>
+                                <Marker position={userlocationsdata[0]} icon={new Icon({ iconUrl: "https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|2ecc71&chf=a,s,ee00FFFF", iconSize: [25, 41], iconAnchor: [12, 41] })}>
                                     <Popup>
                                         <div>
                                             Start of the trip!
@@ -453,7 +357,7 @@ export class JourneyMap extends Component {
                             )}
 
                             {!this.state.selectedAlbum && (
-                                <Marker position={userlocationsdata.at(-1)} icon={new Icon({ iconUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png", iconSize: [25, 41], iconAnchor: [12, 41] })}>
+                                <Marker position={userlocationsdata.at(-1)} icon={new Icon({ iconUrl: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|e85141&chf=a,s,ee00FFFF", iconSize: [25, 41], iconAnchor: [12, 41] })}>
                                     <Popup>
                                         <div>
                                             End of the trip!
@@ -463,24 +367,23 @@ export class JourneyMap extends Component {
                                             <br /><input type="button" id="okBtn" value="Save" />
                                         </div>
                                     </Popup>
-                                </Marker>,
-                                <Polyline pathOptions={limeOptions} positions={userlocationsdata} />
-                            )}
+                                </Marker>)
+                            }
 
+                            {!this.state.selectedAlbum &&
+                                <Polyline pathOptions={limeOptions} positions={userlocationsdata} />
+                            }
 
                             {!this.state.selectedAlbum && (
-
                                 this.state.addedMarkers.map((pos, idx) =>
                                     <Marker key={`marker-${idx}`} marker_index={idx} position={pos} draggable={true} onDragend={this.draggedMarker}>
                                         <Popup >
                                             <div style={{ width: "max-content" }}>
-                                                {/* Marker index:{idx}
-                                                <br /> */}
-                                                coordinate_lat:
+                                                Coordinates:
                                                 <br />
-                                                {pos.lat},
+                                                Lat: {pos.lat},
                                                 <br />
-                                                {pos.lng}
+                                                Lng: {pos.lng}
                                                 <br />
                                                 <span><b>Description</b></span><br /><textarea id="Description" cols="25" rows="5"></textarea><br />
                                                 <br /><input type="button" id="okBtn" value="Save" />
@@ -494,10 +397,11 @@ export class JourneyMap extends Component {
                             {this.state.selectedAlbum && (
                                 <MarkerClusterGroup>{this.state.selectedAlbumMarkers}</MarkerClusterGroup>
                             )}
+
                         </Map>
                         <div
                             style={{
-                                font: "italic small-caps bold 16px/2 cursive", "z-index": "999", padding: "10px", "font-weight": "700"
+                                font: "italic small-caps bold 16px/2 cursive", "z-index": "999", padding: "10px", "fontWeight": "700"
                             }}
                         > DoubleTap to Add and Drag Maker</div>
 
@@ -508,10 +412,6 @@ export class JourneyMap extends Component {
                                 onCloseRequest={() => this.setState({ lightboxShow: false })}
                             />
                         )}
-
-                        {this.state.selectingDate
-
-                        }
                     </div>
                 </div >
             );
@@ -530,15 +430,12 @@ JourneyMap = compose(
         albumsPlaceList: store.albums.albumsPlaceList,
         albumsAutoList: store.albums.albumsAutoList,
         albumsAutoGalleries: store.albums.albumsAutoGalleries,
-        // fetchedAlbumsAutoGalleries: store.albums.fetchedAlbumsAutoGalleries,
-        // fetchingAlbumsAutoGalleries: store.albums.fetchingAlbumsAutoGalleries,
 
         locationClusters: store.util.locationClusters,
         fetchingLocationClusters: store.util.fetchingLocationClusters,
         fetchedLocationClusters: store.util.fetchedLocationClusters,
         userList: store.util.userList,
         auth: store.auth,
-        // photoDetails: store.photos,
     })),
     withTranslation()
 )(JourneyMap);
