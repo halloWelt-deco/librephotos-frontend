@@ -1,5 +1,9 @@
 {
   "settings": {
+    "returnview": "Return Home View",
+    "exportmap": "Export Map",
+    "viewalbum": "View Album",
+    "management": "Management",
     "header": "Settings",
     "profile": "Profile",
     "account": "Account",
@@ -78,7 +82,7 @@
     "statusrescanphotosfalse": "Rescan all photos (file system)",
     "missingphotos": "Missing Photos",
     "missingphotosbutton": "Remove missing photos",
-    "missingphotosdescription": "On every scan LibrePhotos will check if the files are still in the same location or if they have been moved. If they are missing, then they get marked as such.",
+    "missingphotosdescription": "On every scan JourneyLink will check if the files are still in the same location or if they have been moved. If they are missing, then they get marked as such.",
     "eventsalbums": "Event Albums",
     "eventalbumsgenerate": "Generate Event Albums",
     "eventsalbumsdescription": "The backend server will first group photos by time taken. If two consecutive photos are taken within 12 hours of each other, the two photos are considered to be from the same event. After groups are put together in this way, it automatically generates a title for this album.",
@@ -183,7 +187,7 @@
   },
   "sidemenu": {
     "usertrip": "User Trips",
-    "name": "LibrePhotos",
+    "name": "JourneyLink",
     "withtimestamp": "With Timestamp",
     "withouttimestamp": "Without Timestamp",
     "recentlyadded": "Recently Added",
@@ -196,7 +200,7 @@
     "places": "Places",
     "things": "Things",
     "myalbums": "My Albums",
-    "autoalbums": "Auto Created Albums",
+    "autoalbums": "Auto Trip Albums",
     "dataviz": "Data Visualization",
     "placetree": "Place Tree",
     "wordclouds": "Word Clouds",
@@ -205,7 +209,7 @@
     "facecluster": "Face Clusters",
     "datavizsmall": "Data",
     "facerecognition": "Faces",
-    "journeytracking": "Journey Tracking(halloWelt)",
+    "journeytracking": "Journey Tracking",
     "library": "Library",
     "dashboards": "Dashboards",
     "sharing": "Sharing",
@@ -220,7 +224,7 @@
     "select": "Select all"
   },
   "defaultheader": {
-    "setup": "To begin using LibrePhotos, edit your user's scan directory.",
+    "setup": "To begin using JourneyLink, edit your user's scan directory.",
     "gettingstarted": "Edit User",
     "loading": "Loading...",
     "noimages": "No images found",
@@ -275,7 +279,7 @@
     "deleted": "Deleted Items"
   },
   "login": {
-    "name": "LibrePhotos",
+    "name": "JourneyLink",
     "login": "Login",
     "username": "User Name",
     "usernameplaceholder": "Username",
@@ -290,7 +294,7 @@
     "errorusername": "Username may not be blank!",
     "errorusernameexists": "A user with that username already exists.",
     "erroremail": "Enter a valid email address.",
-    "tagline": "A comfy place for your photos.",
+    "tagline": "Track your memories",
     "firsttimesetup": "First time setup"
   },
   "search": {
