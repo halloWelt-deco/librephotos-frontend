@@ -12,5 +12,5 @@
 - Django backend & React frontend. 
 - In development. 
 
-[More detailed info on the backend repo readme](https://github.com/LibrePhotos/librephotos)
+[More detailed info on the backend repo readme](https://github.com/halloWelt-deco/librephotos)
 
